@@ -3,7 +3,6 @@
 import {
     createContext,
     useContext,
-    useEffect,
     useMemo,
     useState,
     type ReactNode,
@@ -14,26 +13,29 @@ import en from "@/src/locales/en";
 import uk from "@/src/locales/uk";
 import type {AppLanguage} from "@/src/helpers";
 
-type Dictionary = typeof en;
+type Dictionary = typeof uk;
 
-type LanguageContextType = {
+type LanguageContextValue = {
     lang: AppLanguage;
-    setLang: (lang: AppLanguage) => void;
     locale: Dictionary;
+    setLang: (language: AppLanguage) => void;
 };
-
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 type LanguageProviderProps = {
     children: ReactNode;
     initialLang: AppLanguage;
 };
 
+const LanguageContext = createContext<LanguageContextValue | null>(null);
+
+const LANGUAGE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+
 export const LanguageProvider = ({
                                      children,
                                      initialLang,
                                  }: LanguageProviderProps) => {
     const router = useRouter();
+
     const [lang, setLangState] = useState<AppLanguage>(initialLang);
 
     const locale = useMemo(() => {
@@ -41,37 +43,44 @@ export const LanguageProvider = ({
     }, [lang]);
 
     const setLang = (nextLang: AppLanguage) => {
+        if (nextLang === lang) {
+            return;
+        }
+
         setLangState(nextLang);
 
-        localStorage.setItem("lang", nextLang);
-        document.cookie = `lang=${nextLang}; path=/; max-age=31536000; SameSite=Lax`;
+        document.cookie = [
+            `lang=${nextLang}`,
+            "Path=/",
+            `Max-Age=${LANGUAGE_COOKIE_MAX_AGE}`,
+            "SameSite=Lax",
+        ].join("; ");
 
         router.refresh();
     };
 
-    useEffect(() => {
-        localStorage.setItem("lang", lang);
-        document.cookie = `lang=${lang}; path=/; max-age=31536000; SameSite=Lax`;
-    }, [lang]);
+    const value = useMemo<LanguageContextValue>(() => {
+        return {
+            lang,
+            locale,
+            setLang,
+        };
+    }, [lang, locale]);
 
     return (
-        <LanguageContext.Provider
-            value={{
-                lang,
-                setLang,
-                locale,
-            }}
-        >
+        <LanguageContext.Provider value={value}>
             {children}
         </LanguageContext.Provider>
     );
 };
 
-export const useLanguage = () => {
+export const useLanguage = (): LanguageContextValue => {
     const context = useContext(LanguageContext);
 
     if (!context) {
-        throw new Error("useLanguage must be used within LanguageProvider");
+        throw new Error(
+            "useLanguage must be used within LanguageProvider",
+        );
     }
 
     return context;

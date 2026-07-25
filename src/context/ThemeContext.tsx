@@ -4,92 +4,78 @@ import {
     createContext,
     useCallback,
     useContext,
-    useEffect,
-    useSyncExternalStore,
+    useMemo,
+    useState,
     type ReactNode,
 } from "react";
 
-type Theme = "light" | "dark";
+import type {AppTheme} from "@/src/helpers";
 
-interface ThemeContextType {
-    theme: Theme;
+type ThemeContextValue = {
+    theme: AppTheme;
     toggleTheme: () => void;
-}
-
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
-const THEME_EVENT = "theme-change";
-
-const isTheme = (value: string | null): value is Theme => {
-    return value === "light" || value === "dark";
 };
 
-const getTheme = (): Theme => {
-    if (typeof window === "undefined") return "dark";
-
-    const saved = localStorage.getItem("theme");
-
-    if (isTheme(saved)) {
-        return saved;
-    }
-
-    return "dark";
+type ThemeProviderProps = {
+    children: ReactNode;
+    initialTheme: AppTheme;
 };
 
-const getServerTheme = (): Theme => {
-    return "dark";
-};
+const ThemeContext = createContext<ThemeContextValue | null>(null);
 
+const THEME_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
-const subscribe = (callback: () => void) => {
-    if (typeof window === "undefined") {
-        return () => {};
-    }
-
-    window.addEventListener("storage", callback);
-    window.addEventListener(THEME_EVENT, callback);
-
-    return () => {
-        window.removeEventListener("storage", callback);
-        window.removeEventListener(THEME_EVENT, callback);
-    };
-};
-
-const applyTheme = (theme: Theme) => {
+const applyTheme = (theme: AppTheme) => {
     document.documentElement.classList.remove("light", "dark");
     document.documentElement.classList.add(theme);
 };
 
-export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-    const theme = useSyncExternalStore(subscribe, getTheme, getServerTheme);
-
-    useEffect(() => {
-        localStorage.setItem("theme", theme);
-        applyTheme(theme);
-    }, [theme]);
+export const ThemeProvider = ({
+                                  children,
+                                  initialTheme,
+                              }: ThemeProviderProps) => {
+    const [theme, setTheme] = useState<AppTheme>(initialTheme);
 
     const toggleTheme = useCallback(() => {
-        const nextTheme: Theme = getTheme() === "light" ? "dark" : "light";
+        setTheme((currentTheme) => {
+            const nextTheme: AppTheme =
+                currentTheme === "dark" ? "light" : "dark";
 
-        localStorage.setItem("theme", nextTheme);
-        applyTheme(nextTheme);
+            applyTheme(nextTheme);
 
-        window.dispatchEvent(new Event(THEME_EVENT));
+            document.cookie = [
+                `theme=${nextTheme}`,
+                "Path=/",
+                `Max-Age=${THEME_COOKIE_MAX_AGE}`,
+                "SameSite=Lax",
+            ].join("; ");
+
+            return nextTheme;
+        });
     }, []);
 
+    const value = useMemo<ThemeContextValue>(() => {
+        return {
+            theme,
+            toggleTheme,
+        };
+    }, [theme, toggleTheme]);
+
     return (
-        <ThemeContext.Provider value={{ theme, toggleTheme }}>
+        <ThemeContext.Provider value={value}>
             {children}
         </ThemeContext.Provider>
     );
 };
 
-export const useTheme = () => {
-    const ctx = useContext(ThemeContext);
+export const useTheme = (): ThemeContextValue => {
+    const context = useContext(ThemeContext);
 
-    if (!ctx) {
-        throw new Error("useTheme must be used within ThemeProvider");
+    if (!context) {
+        throw new Error(
+            "useTheme must be used within ThemeProvider",
+        );
     }
 
-    return ctx;
+    return context;
 };
