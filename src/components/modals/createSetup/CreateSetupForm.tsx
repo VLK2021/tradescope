@@ -15,6 +15,8 @@ import {
     X,
 } from "lucide-react";
 
+import { useRouter } from "next/navigation";
+
 
 import {useLanguage} from "@/src/context";
 import {SearchableSelect, SearchableSelectOption} from "@/src/common/searchableSelect/input";
@@ -68,6 +70,8 @@ const CreateSetupForm = ({
                              onCancelAction,
                          }: CreateSetupFormProps) => {
     const {locale} = useLanguage();
+
+    const router = useRouter();
 
     const [symbolOptions, setSymbolOptions] =
         useState<SearchableSelectOption[]>([]);
@@ -307,6 +311,7 @@ const CreateSetupForm = ({
 
             reset();
             onSuccessAction();
+            router.refresh();
         } catch {
             setSubmitError(
                 locale.createSetup
