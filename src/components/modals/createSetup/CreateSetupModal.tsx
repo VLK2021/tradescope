@@ -1,8 +1,14 @@
 "use client";
 
+import {
+    useEffect,
+    type MouseEvent,
+} from "react";
 import {X} from "lucide-react";
 
 import {useLanguage} from "@/src/context";
+
+import {CreateSetupForm} from "./CreateSetupForm";
 
 type CreateSetupModalProps = {
     isOpen: boolean;
@@ -15,16 +21,47 @@ const CreateSetupModal = ({
                           }: CreateSetupModalProps) => {
     const {locale} = useLanguage();
 
+    useEffect(() => {
+        if (!isOpen) {
+            return;
+        }
+
+        const previousOverflow =
+            document.body.style.overflow;
+
+        document.body.style.overflow =
+            "hidden";
+
+        const handleKeyDown = (
+            event: KeyboardEvent,
+        ) => {
+            if (event.key === "Escape") {
+                onClose();
+            }
+        };
+
+        window.addEventListener(
+            "keydown",
+            handleKeyDown,
+        );
+
+        return () => {
+            document.body.style.overflow =
+                previousOverflow;
+
+            window.removeEventListener(
+                "keydown",
+                handleKeyDown,
+            );
+        };
+    }, [isOpen, onClose]);
+
     if (!isOpen) {
         return null;
     }
 
-    const handleOverlayClick = () => {
-        onClose();
-    };
-
-    const handleModalClick = (
-        event: React.MouseEvent<HTMLDivElement>,
+    const handleDialogClick = (
+        event: MouseEvent<HTMLDivElement>,
     ) => {
         event.stopPropagation();
     };
@@ -42,17 +79,19 @@ const CreateSetupModal = ({
                 p-4
                 backdrop-blur-sm
             "
-            onClick={handleOverlayClick}
+            onClick={onClose}
         >
             <div
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="create-setup-modal-title"
                 className="
-                    max-h-[calc(100vh-2rem)]
+                    flex
+                    max-h-[calc(100dvh-2rem)]
                     w-full
-                    max-w-2xl
-                    overflow-y-auto
+                    max-w-3xl
+                    flex-col
+                    overflow-hidden
                     rounded-2xl
                     border
                     border-[var(--color-border)]
@@ -60,40 +99,51 @@ const CreateSetupModal = ({
                     text-[var(--color-text)]
                     shadow-2xl
                 "
-                onClick={handleModalClick}
+                onClick={
+                    handleDialogClick
+                }
             >
                 <header
                     className="
-                        sticky
-                        top-0
-                        z-10
                         flex
-                        items-center
+                        shrink-0
+                        items-start
                         justify-between
                         gap-4
                         border-b
                         border-[var(--color-border)]
-                        bg-[var(--color-surface)]
                         px-5
                         py-4
                         sm:px-6
                     "
                 >
-                    <h2
-                        id="create-setup-modal-title"
-                        className="
-                            text-lg
-                            font-semibold
-                            text-[var(--color-text)]
-                            sm:text-xl
-                        "
-                    >
-                        {locale.createSetup.title}
-                    </h2>
+                    <div className="min-w-0">
+                        <h2
+                            id="create-setup-modal-title"
+                            className="
+                                text-lg
+                                font-semibold
+                                text-[var(--color-text)]
+                                sm:text-xl
+                            "
+                        >
+                            {
+                                locale.createSetup
+                                    .title
+                            }
+                        </h2>
+
+                        <p className="mt-1 text-sm leading-5 text-[var(--color-text-secondary)]">
+                            Додайте торгову пару, напрямок і цінові рівні сетапу.
+                        </p>
+                    </div>
 
                     <button
                         type="button"
-                        aria-label={locale.createSetup.close}
+                        aria-label={
+                            locale.createSetup
+                                .close
+                        }
                         onClick={onClose}
                         className="
                             flex
@@ -104,7 +154,6 @@ const CreateSetupModal = ({
                             rounded-lg
                             text-[var(--color-text-muted)]
                             transition-colors
-                            duration-200
                             hover:bg-[var(--color-background)]
                             hover:text-[var(--color-text)]
                             focus-visible:outline-none
@@ -122,10 +171,15 @@ const CreateSetupModal = ({
                     </button>
                 </header>
 
-                <div className="px-5 py-5 sm:px-6 sm:py-6">
-                    <p className="text-sm text-[var(--color-text-secondary)]">
-                        {locale.createSetup.testContent}
-                    </p>
+                <div className="overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
+                    <CreateSetupForm
+                        onSuccessAction={
+                            onClose
+                        }
+                        onCancelAction={
+                            onClose
+                        }
+                    />
                 </div>
             </div>
         </div>
