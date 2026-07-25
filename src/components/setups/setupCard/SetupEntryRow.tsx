@@ -11,10 +11,13 @@ type SetupEntryRowProps = {
     currentPrice: number | null;
 };
 
-const formatEntryPercent = (
-    percent: number,
+const formatSignedPercent = (
+    value: number,
 ): string => {
-    return `${percent.toFixed(2)}%`;
+    const sign =
+        value > 0 ? "+" : "";
+
+    return `${sign}${value.toFixed(3)}%`;
 };
 
 const SetupEntryRow = ({
@@ -26,25 +29,31 @@ const SetupEntryRow = ({
         calculatePriceDistance({
             currentPrice,
             levelPrice: price,
-            levelType: "entry",
         });
+
+    const isPositive =
+        distance !== null &&
+        distance.percent > 0;
+
+    const isNegative =
+        distance !== null &&
+        distance.percent < 0;
 
     return (
         <div
             className="
                 grid
                 min-w-0
-                grid-cols-[28px_minmax(0,1fr)_90px]
+                grid-cols-[24px_minmax(74px,1fr)_68px_minmax(82px,auto)]
                 items-center
-                gap-x-3
-                gap-y-1
-                py-2
+                gap-2
+                py-1.5
             "
         >
             <span
                 className="
                     flex
-                    size-7
+                    size-6
                     items-center
                     justify-center
                     rounded-full
@@ -64,7 +73,7 @@ const SetupEntryRow = ({
                     text-ellipsis
                     whitespace-nowrap
                     font-mono
-                    text-base
+                    text-sm
                     font-medium
                     tabular-nums
                     text-[var(--color-text)]
@@ -75,17 +84,23 @@ const SetupEntryRow = ({
             </span>
 
             <span
-                className="
+                className={`
                     text-right
                     font-mono
-                    text-base
+                    text-xs
                     font-semibold
                     tabular-nums
-                    text-[var(--color-danger)]
-                "
+                    ${
+                    isPositive
+                        ? "text-[var(--color-success)]"
+                        : isNegative
+                            ? "text-[var(--color-danger)]"
+                            : "text-[var(--color-text-muted)]"
+                }
+                `}
             >
                 {distance
-                    ? formatEntryPercent(
+                    ? formatSignedPercent(
                         distance.percent,
                     )
                     : "—"}
@@ -93,20 +108,31 @@ const SetupEntryRow = ({
 
             <span
                 className="
-                    col-start-2
-                    col-end-4
+                    min-w-0
+                    overflow-hidden
+                    text-ellipsis
+                    whitespace-nowrap
                     text-right
                     font-mono
-                    text-sm
+                    text-xs
                     tabular-nums
                     text-[var(--color-text-muted)]
                 "
+                title={
+                    distance
+                        ? `${Math.abs(
+                            distance.priceDifference,
+                        )} USDT`
+                        : undefined
+                }
             >
                 {distance
                     ? `(${formatSetupPrice(
-                        distance.priceDifference,
+                        Math.abs(
+                            distance.priceDifference,
+                        ),
                     )} USDT)`
-                    : null}
+                    : "—"}
             </span>
         </div>
     );

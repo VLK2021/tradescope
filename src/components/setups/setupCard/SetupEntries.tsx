@@ -16,7 +16,7 @@ const SetupEntries = ({
             className="
                 border-t
                 border-[var(--color-border)]
-                pt-3
+                pt-2.5
             "
         >
             <h3
@@ -30,7 +30,7 @@ const SetupEntries = ({
                 Входи
             </h3>
 
-            <div>
+            <div className="space-y-0">
                 {entries.map(
                     (entry, index) => (
                         <SetupEntryRow

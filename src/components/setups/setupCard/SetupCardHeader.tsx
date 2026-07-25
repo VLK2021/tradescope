@@ -35,13 +35,13 @@ const SetupCardHeader = ({
                 flex
                 min-w-0
                 items-center
-                gap-3
+                gap-2
             "
         >
             <div
                 className={`
                     flex
-                    size-9
+                    size-8
                     shrink-0
                     items-center
                     justify-center
@@ -49,11 +49,11 @@ const SetupCardHeader = ({
                     ${
                     isLong
                         ? `
-                                bg-[color-mix(in_srgb,var(--color-success)_12%,var(--color-surface))]
+                                bg-[color-mix(in_srgb,var(--color-success)_10%,var(--color-surface))]
                                 text-[var(--color-success)]
                             `
                         : `
-                                bg-[color-mix(in_srgb,var(--color-danger)_12%,var(--color-surface))]
+                                bg-[color-mix(in_srgb,var(--color-danger)_10%,var(--color-surface))]
                                 text-[var(--color-danger)]
                             `
                 }
@@ -79,8 +79,9 @@ const SetupCardHeader = ({
                     overflow-hidden
                     text-ellipsis
                     whitespace-nowrap
-                    text-base
+                    text-lg
                     font-semibold
+                    tracking-tight
                     text-[var(--color-text)]
                 "
                 title={symbol}
@@ -100,8 +101,9 @@ const SetupCardHeader = ({
 
             <span
                 className={`
+                    ml-1
                     shrink-0
-                    text-sm
+                    text-xs
                     font-semibold
                     ${
                     isLong

@@ -1,34 +1,16 @@
-type PriceLevelType =
-    | "entry"
-    | "takeProfit"
-    | "stopLoss";
-
 type PriceDistanceResult = {
     percent: number;
-    absolutePercent: number;
     priceDifference: number;
 };
 
 type CalculatePriceDistanceParams = {
     currentPrice: number | null;
     levelPrice: string | number;
-    levelType: PriceLevelType;
-};
-
-const getPercentSign = (
-    levelType: PriceLevelType,
-): 1 | -1 => {
-    if (levelType === "takeProfit") {
-        return 1;
-    }
-
-    return -1;
 };
 
 const calculatePriceDistance = ({
                                     currentPrice,
                                     levelPrice,
-                                    levelType,
                                 }: CalculatePriceDistanceParams): PriceDistanceResult | null => {
     const numericLevelPrice =
         Number(levelPrice);
@@ -44,33 +26,23 @@ const calculatePriceDistance = ({
     }
 
     const priceDifference =
-        Math.abs(
-            numericLevelPrice -
-            currentPrice,
-        );
+        numericLevelPrice -
+        currentPrice;
 
-    const absolutePercent =
+    const percent =
         (priceDifference /
             currentPrice) *
         100;
 
-    const percent =
-        absolutePercent *
-        getPercentSign(levelType);
-
     return {
         percent,
-        absolutePercent,
         priceDifference,
     };
 };
 
-export {
-    calculatePriceDistance,
-};
+export {calculatePriceDistance};
 
 export type {
     CalculatePriceDistanceParams,
     PriceDistanceResult,
-    PriceLevelType,
 };

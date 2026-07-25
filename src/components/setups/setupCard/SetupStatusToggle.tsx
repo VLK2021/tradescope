@@ -17,47 +17,47 @@ const SetupStatusToggle = ({
         ? "Активний"
         : "Неактивний";
 
-    const ariaLabel = isActive
+    const actionLabel = isActive
         ? "Зробити сетап неактивним"
         : "Зробити сетап активним";
 
     return (
         <button
             type="button"
-            aria-label={ariaLabel}
-            title={ariaLabel}
+            aria-label={actionLabel}
+            title={actionLabel}
             disabled={isUpdating}
             onClick={onToggleAction}
             className={`
                 inline-flex
-                h-8
+                h-6
                 shrink-0
                 cursor-pointer
                 items-center
                 justify-center
-                gap-1.5
-                rounded-lg
+                gap-1
+                rounded-md
                 border
-                px-2.5
-                text-xs
+                px-1.5
+                text-[10px]
                 font-semibold
                 uppercase
+                tracking-wide
                 transition-colors
                 disabled:cursor-wait
                 disabled:opacity-60
                 ${
                 isActive
                     ? `
-                            border-[color-mix(in_srgb,var(--color-success)_20%,transparent)]
-                            bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)]
+                            border-[color-mix(in_srgb,var(--color-success)_18%,transparent)]
+                            bg-[color-mix(in_srgb,var(--color-success)_8%,transparent)]
                             text-[var(--color-success)]
-                            hover:bg-[color-mix(in_srgb,var(--color-success)_16%,transparent)]
+                            hover:bg-[color-mix(in_srgb,var(--color-success)_14%,transparent)]
                         `
                     : `
                             border-[var(--color-border)]
-                            bg-[var(--color-surface)]
+                            bg-transparent
                             text-[var(--color-text-muted)]
-                            hover:border-[var(--color-text-muted)]
                             hover:text-[var(--color-text)]
                         `
             }
@@ -65,13 +65,13 @@ const SetupStatusToggle = ({
         >
             {isUpdating ? (
                 <LoaderCircle
-                    className="size-3.5 animate-spin"
+                    className="size-3 animate-spin"
                     aria-hidden="true"
                 />
             ) : (
                 <span
                     className={`
-                        size-1.5
+                        size-1
                         rounded-full
                         ${
                         isActive
