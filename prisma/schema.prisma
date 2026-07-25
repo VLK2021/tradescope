@@ -6,3 +6,24 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum SetupDirection {
+  LONG
+  SHORT
+}
+
+model Setup {
+  id        String         @id @default(uuid())
+  symbol    String
+  direction SetupDirection
+  isActive  Boolean        @default(true)
+
+  entries     String[]
+  takeProfits String[]
+  stopLoss    String?
+
+  note String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
