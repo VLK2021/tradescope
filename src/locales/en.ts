@@ -5,6 +5,12 @@ const en = {
         enableLightTheme: "Enable light theme",
         enableDarkTheme: "Enable dark theme",
     },
+
+    modal: {
+
+    },
+
+
 };
 
 export default en;

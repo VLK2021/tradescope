@@ -4,19 +4,12 @@ import {Plus} from "lucide-react";
 
 import {useLanguage} from "@/src/context";
 
-type AddSetupButtonProps = {
-    onClick: () => void;
-};
-
-const AddSetupButton = ({
-                            onClick,
-                        }: AddSetupButtonProps) => {
+const AddSetupButton = () => {
     const {locale} = useLanguage();
 
     return (
         <button
             type="button"
-            onClick={onClick}
             className="
                 flex
                 h-11

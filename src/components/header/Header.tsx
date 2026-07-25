@@ -1,6 +1,6 @@
-import {AddSetupControl} from "./AddSetupControl";
 import {HeaderBrand} from "./HeaderBrand";
 import {HeaderControls} from "./HeaderControls";
+import {AddSetupButton} from "@/src/components/header/AddSetupButton";
 
 const Header = () => {
     return (
@@ -51,8 +51,9 @@ const Header = () => {
                         md:flex-1
                     "
                 >
-                    <AddSetupControl />
+                    <AddSetupButton />
                 </div>
+
 
                 <div className="flex flex-1 justify-end">
                     <HeaderControls />

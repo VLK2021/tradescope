@@ -5,6 +5,10 @@ const uk = {
         enableLightTheme: "Увімкнути світлу тему",
         enableDarkTheme: "Увімкнути темну тему",
     },
+
+    modal: {
+
+    },
 };
 
 export default uk;
