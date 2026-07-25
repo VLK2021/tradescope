@@ -4,6 +4,7 @@ type PriceListener = (
 
 type BinanceMarkPriceEvent = {
     e?: string;
+    E?: number;
     s?: string;
     p?: string;
 };
@@ -18,6 +19,12 @@ type BinanceSubscriptionResponse = {
     id?: number;
 };
 
+type BinanceErrorResponse = {
+    code?: number;
+    msg?: string;
+    id?: number;
+};
+
 const BINANCE_FUTURES_SOCKET_URL =
     "wss://fstream.binance.com/market/stream";
 
@@ -27,9 +34,6 @@ const normalizeSymbol = (
     symbol: string,
 ): string => {
     return symbol
-        .replaceAll("/", "")
-        .replaceAll("-", "")
-        .replaceAll("_", "")
         .trim()
         .toUpperCase();
 };
@@ -37,7 +41,9 @@ const normalizeSymbol = (
 const getStreamName = (
     symbol: string,
 ): string => {
-    return `${normalizeSymbol(symbol).toLowerCase()}@markPrice@1s`;
+    return `${normalizeSymbol(
+        symbol,
+    ).toLowerCase()}@markPrice@1s`;
 };
 
 class BinanceTickerSocket {
@@ -54,12 +60,15 @@ class BinanceTickerSocket {
         new Map<string, number>();
 
     private reconnectTimer:
-        | ReturnType<typeof setTimeout>
+        | ReturnType<
+        typeof setTimeout
+    >
         | null = null;
 
     private requestId = 1;
 
-    private intentionallyClosed = false;
+    private intentionallyClosed =
+        false;
 
     subscribe(
         symbol: string,
@@ -68,15 +77,22 @@ class BinanceTickerSocket {
         const normalizedSymbol =
             normalizeSymbol(symbol);
 
+        if (!normalizedSymbol) {
+            return () => undefined;
+        }
+
         const symbolListeners =
             this.listeners.get(
                 normalizedSymbol,
-            ) ?? new Set<PriceListener>();
+            ) ??
+            new Set<PriceListener>();
 
         const isFirstListener =
             symbolListeners.size === 0;
 
-        symbolListeners.add(listener);
+        symbolListeners.add(
+            listener,
+        );
 
         this.listeners.set(
             normalizedSymbol,
@@ -88,11 +104,15 @@ class BinanceTickerSocket {
                 normalizedSymbol,
             );
 
-        if (cachedPrice !== undefined) {
+        if (
+            cachedPrice !==
+            undefined
+        ) {
             listener(cachedPrice);
         }
 
-        this.intentionallyClosed = false;
+        this.intentionallyClosed =
+            false;
 
         this.connect();
 
@@ -120,20 +140,32 @@ class BinanceTickerSocket {
         listener: PriceListener,
     ): void {
         const symbolListeners =
-            this.listeners.get(symbol);
+            this.listeners.get(
+                symbol,
+            );
 
         if (!symbolListeners) {
             return;
         }
 
-        symbolListeners.delete(listener);
+        symbolListeners.delete(
+            listener,
+        );
 
-        if (symbolListeners.size > 0) {
+        if (
+            symbolListeners.size >
+            0
+        ) {
             return;
         }
 
-        this.listeners.delete(symbol);
-        this.prices.delete(symbol);
+        this.listeners.delete(
+            symbol,
+        );
+
+        this.prices.delete(
+            symbol,
+        );
 
         if (
             this.socket?.readyState ===
@@ -145,7 +177,10 @@ class BinanceTickerSocket {
             );
         }
 
-        if (this.listeners.size === 0) {
+        if (
+            this.listeners.size ===
+            0
+        ) {
             this.disconnect();
         }
     }
@@ -169,9 +204,10 @@ class BinanceTickerSocket {
 
         this.clearReconnectTimer();
 
-        this.socket = new WebSocket(
-            BINANCE_FUTURES_SOCKET_URL,
-        );
+        this.socket =
+            new WebSocket(
+                BINANCE_FUTURES_SOCKET_URL,
+            );
 
         this.socket.addEventListener(
             "open",
@@ -195,42 +231,54 @@ class BinanceTickerSocket {
     }
 
     private disconnect(): void {
-        this.intentionallyClosed = true;
+        this.intentionallyClosed =
+            true;
 
         this.clearReconnectTimer();
 
-        if (this.socket) {
-            this.removeSocketListeners();
-            this.socket.close();
-            this.socket = null;
-        }
-    }
-
-    private handleOpen = (): void => {
-        const symbols = Array.from(
-            this.listeners.keys(),
-        );
-
-        if (symbols.length === 0) {
+        if (!this.socket) {
             return;
         }
 
-        const streams = symbols.map(
-            getStreamName,
-        );
+        this.removeSocketListeners();
 
-        this.sendMessage(
-            "SUBSCRIBE",
-            streams,
-        );
-    };
+        this.socket.close();
+
+        this.socket = null;
+    }
+
+    private handleOpen =
+        (): void => {
+            const symbols =
+                Array.from(
+                    this.listeners.keys(),
+                );
+
+            if (
+                symbols.length === 0
+            ) {
+                return;
+            }
+
+            const streams =
+                symbols.map(
+                    getStreamName,
+                );
+
+            this.sendMessage(
+                "SUBSCRIBE",
+                streams,
+            );
+        };
 
     private handleMessage = (
         event: MessageEvent<string>,
     ): void => {
         try {
             const message: unknown =
-                JSON.parse(event.data);
+                JSON.parse(
+                    event.data,
+                );
 
             if (
                 this.isSubscriptionResponse(
@@ -240,26 +288,48 @@ class BinanceTickerSocket {
                 return;
             }
 
+            if (
+                this.isErrorResponse(
+                    message,
+                )
+            ) {
+                console.error(
+                    "Binance Futures WebSocket error:",
+                    message.code,
+                    message.msg,
+                );
+
+                return;
+            }
+
             const priceEvent =
-                this.getPriceEvent(message);
+                this.getPriceEvent(
+                    message,
+                );
 
             if (
-                !priceEvent?.s ||
-                !priceEvent.p
+                typeof priceEvent?.s !==
+                "string" ||
+                typeof priceEvent.p !==
+                "string"
             ) {
                 return;
             }
 
-            const symbol = normalizeSymbol(
-                priceEvent.s,
-            );
+            const symbol =
+                normalizeSymbol(
+                    priceEvent.s,
+                );
 
-            const price = Number(
-                priceEvent.p,
-            );
+            const price =
+                Number(
+                    priceEvent.p,
+                );
 
             if (
-                !Number.isFinite(price) ||
+                !Number.isFinite(
+                    price,
+                ) ||
                 price <= 0
             ) {
                 return;
@@ -271,36 +341,44 @@ class BinanceTickerSocket {
             );
 
             const symbolListeners =
-                this.listeners.get(symbol);
+                this.listeners.get(
+                    symbol,
+                );
 
             symbolListeners?.forEach(
                 (listener) => {
                     listener(price);
                 },
             );
-        } catch {
-            return;
+        } catch (error) {
+            console.error(
+                "Failed to process Binance Futures WebSocket message:",
+                error,
+            );
         }
     };
 
-    private handleClose = (): void => {
-        this.removeSocketListeners();
+    private handleClose =
+        (): void => {
+            this.removeSocketListeners();
 
-        this.socket = null;
+            this.socket = null;
 
-        if (
-            this.intentionallyClosed ||
-            this.listeners.size === 0
-        ) {
-            return;
-        }
+            if (
+                this.intentionallyClosed ||
+                this.listeners.size ===
+                0
+            ) {
+                return;
+            }
 
-        this.scheduleReconnect();
-    };
+            this.scheduleReconnect();
+        };
 
-    private handleError = (): void => {
-        this.socket?.close();
-    };
+    private handleError =
+        (): void => {
+            this.socket?.close();
+        };
 
     private getPriceEvent(
         message: unknown,
@@ -317,8 +395,10 @@ class BinanceTickerSocket {
             message as BinanceMarkPriceEvent;
 
         if (
-            directEvent.s &&
-            directEvent.p
+            typeof directEvent.s ===
+            "string" &&
+            typeof directEvent.p ===
+            "string"
         ) {
             return directEvent;
         }
@@ -327,8 +407,12 @@ class BinanceTickerSocket {
             message as BinanceCombinedMessage;
 
         if (
-            combinedMessage.data?.s &&
-            combinedMessage.data.p
+            typeof combinedMessage
+                .data?.s ===
+            "string" &&
+            typeof combinedMessage
+                .data?.p ===
+            "string"
         ) {
             return combinedMessage.data;
         }
@@ -353,15 +437,37 @@ class BinanceTickerSocket {
         );
     }
 
+    private isErrorResponse(
+        message: unknown,
+    ): message is BinanceErrorResponse {
+        if (
+            typeof message !==
+            "object" ||
+            message === null
+        ) {
+            return false;
+        }
+
+        return (
+            "code" in message &&
+            "msg" in message
+        );
+    }
+
     private sendSubscription(
         method:
             | "SUBSCRIBE"
             | "UNSUBSCRIBE",
         symbol: string,
     ): void {
-        this.sendMessage(method, [
-            getStreamName(symbol),
-        ]);
+        this.sendMessage(
+            method,
+            [
+                getStreamName(
+                    symbol,
+                ),
+            ],
+        );
     }
 
     private sendMessage(
@@ -398,7 +504,9 @@ class BinanceTickerSocket {
     }
 
     private clearReconnectTimer(): void {
-        if (!this.reconnectTimer) {
+        if (
+            !this.reconnectTimer
+        ) {
             return;
         }
 
@@ -406,7 +514,8 @@ class BinanceTickerSocket {
             this.reconnectTimer,
         );
 
-        this.reconnectTimer = null;
+        this.reconnectTimer =
+            null;
     }
 
     private removeSocketListeners(): void {

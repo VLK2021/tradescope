@@ -8,9 +8,6 @@ import type {
 const BINANCE_FUTURES_EXCHANGE_INFO_URL =
     "https://fapi.binance.com/fapi/v1/exchangeInfo";
 
-const BINANCE_SYMBOLS_REVALIDATE_SECONDS =
-    60 * 60;
-
 type BinancePriceFilter =
     BinanceFuturesFilter & {
     minPrice: string;
@@ -24,39 +21,45 @@ const isBinancePriceFilter = (
     return (
         filter.filterType ===
         "PRICE_FILTER" &&
-        typeof filter.minPrice === "string" &&
-        typeof filter.maxPrice === "string" &&
-        typeof filter.tickSize === "string"
+        typeof filter.minPrice ===
+        "string" &&
+        typeof filter.maxPrice ===
+        "string" &&
+        typeof filter.tickSize ===
+        "string"
     );
 };
 
-const getPriceFilter = (
+const findPriceFilter = (
     symbol: BinanceFuturesSymbolRaw,
-): BinancePriceFilter => {
-    const priceFilter =
+): BinancePriceFilter | null => {
+    return (
         symbol.filters.find(
             isBinancePriceFilter,
-        );
-
-    if (!priceFilter) {
-        throw new Error(
-            `PRICE_FILTER is missing for Binance symbol ${symbol.symbol}`,
-        );
-    }
-
-    return priceFilter;
+        ) ?? null
+    );
 };
 
 const normalizeBinanceSymbol = (
     symbol: BinanceFuturesSymbolRaw,
-): BinanceFuturesSymbol => {
+): BinanceFuturesSymbol | null => {
     const priceFilter =
-        getPriceFilter(symbol);
+        findPriceFilter(symbol);
+
+    if (!priceFilter) {
+        console.warn(
+            `PRICE_FILTER is missing for Binance Futures symbol ${symbol.symbol}`,
+        );
+
+        return null;
+    }
 
     return {
         symbol: symbol.symbol,
-        baseAsset: symbol.baseAsset,
-        quoteAsset: symbol.quoteAsset,
+        baseAsset:
+        symbol.baseAsset,
+        quoteAsset:
+        symbol.quoteAsset,
         pricePrecision:
         symbol.pricePrecision,
         minPrice:
@@ -68,14 +71,40 @@ const normalizeBinanceSymbol = (
     };
 };
 
-const isSupportedFuturesSymbol = (
+const isTradingFuturesSymbol = (
     symbol: BinanceFuturesSymbolRaw,
 ): boolean => {
     return (
         symbol.status === "TRADING" &&
-        symbol.contractType ===
-        "PERPETUAL" &&
-        symbol.quoteAsset === "USDT"
+        typeof symbol.symbol ===
+        "string" &&
+        symbol.symbol.trim().length >
+        0 &&
+        typeof symbol.baseAsset ===
+        "string" &&
+        typeof symbol.quoteAsset ===
+        "string"
+    );
+};
+
+const removeDuplicateSymbols = (
+    symbols: BinanceFuturesSymbol[],
+): BinanceFuturesSymbol[] => {
+    const uniqueSymbols =
+        new Map<
+            string,
+            BinanceFuturesSymbol
+        >();
+
+    symbols.forEach((symbol) => {
+        uniqueSymbols.set(
+            symbol.symbol,
+            symbol,
+        );
+    });
+
+    return Array.from(
+        uniqueSymbols.values(),
     );
 };
 
@@ -86,44 +115,69 @@ export const getBinanceFuturesSymbols =
         const response = await fetch(
             BINANCE_FUTURES_EXCHANGE_INFO_URL,
             {
-                next: {
-                    revalidate:
-                    BINANCE_SYMBOLS_REVALIDATE_SECONDS,
+                method: "GET",
+
+                headers: {
+                    Accept: "application/json",
                 },
+
+                cache: "no-store",
             },
         );
 
         if (!response.ok) {
             throw new Error(
-                `Binance exchange info request failed with status ${response.status}`,
+                `Binance Futures exchange info request failed with status ${response.status}`,
             );
         }
 
         const data =
             (await response.json()) as BinanceExchangeInfoResponse;
 
-        if (!Array.isArray(data.symbols)) {
+        if (
+            !data ||
+            !Array.isArray(
+                data.symbols,
+            )
+        ) {
             throw new Error(
-                "Binance exchange info response does not contain symbols",
+                "Binance Futures exchange info response does not contain symbols",
             );
         }
 
-        return data.symbols
-            .filter(
-                isSupportedFuturesSymbol,
-            )
-            .map(
-                normalizeBinanceSymbol,
-            )
-            .sort(
-                (
-                    firstSymbol,
-                    secondSymbol,
-                ) =>
-                    firstSymbol.symbol.localeCompare(
-                        secondSymbol.symbol,
-                    ),
-            );
+        const normalizedSymbols =
+            data.symbols
+                .filter(
+                    isTradingFuturesSymbol,
+                )
+                .map(
+                    normalizeBinanceSymbol,
+                )
+                .filter(
+                    (
+                        symbol,
+                    ): symbol is BinanceFuturesSymbol =>
+                        symbol !==
+                        null,
+                );
+
+        return removeDuplicateSymbols(
+            normalizedSymbols,
+        ).sort(
+            (
+                firstSymbol,
+                secondSymbol,
+            ) =>
+                firstSymbol.symbol.localeCompare(
+                    secondSymbol.symbol,
+                    "en",
+                    {
+                        numeric: true,
+                        sensitivity:
+                            "base",
+                    },
+                ),
+        );
     };
 
 export const getBinanceFuturesSymbol =
@@ -137,13 +191,17 @@ export const getBinanceFuturesSymbol =
                 .trim()
                 .toUpperCase();
 
+        if (!normalizedSymbol) {
+            return null;
+        }
+
         const symbols =
             await getBinanceFuturesSymbols();
 
         return (
             symbols.find(
                 (binanceSymbol) =>
-                    binanceSymbol.symbol ===
+                    binanceSymbol.symbol.toUpperCase() ===
                     normalizedSymbol,
             ) ?? null
         );
