@@ -6,11 +6,11 @@ const en = {
         enableDarkTheme: "Enable dark theme",
     },
 
-    modal: {
-
+    createSetup: {
+        title: "Create setup",
+        close: "Close setup creation window",
+        testContent: "The modal works. The setup creation form will be displayed here.",
     },
-
-
 };
 
 export default en;
