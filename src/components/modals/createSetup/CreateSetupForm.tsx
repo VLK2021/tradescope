@@ -15,6 +15,7 @@ import {
     X,
 } from "lucide-react";
 
+
 import {useLanguage} from "@/src/context";
 import {SearchableSelect, SearchableSelectOption} from "@/src/common/searchableSelect/input";
 
@@ -45,29 +46,6 @@ const PRICE_PATTERN =
     /^(?:0|[1-9]\d*)(?:\.\d{1,9})?$/;
 
 const MAX_LEVELS = 10;
-
-const getPriceError = (
-    value: string,
-    required: boolean,
-) => {
-    const normalizedValue = value.trim();
-
-    if (!normalizedValue) {
-        return required
-            ? "Ціна є обов'язковою"
-            : true;
-    }
-
-    if (!PRICE_PATTERN.test(normalizedValue)) {
-        return "Введіть коректну ціну з максимальною точністю 9 знаків після крапки";
-    }
-
-    if (Number(normalizedValue) <= 0) {
-        return "Ціна повинна бути більшою за нуль";
-    }
-
-    return true;
-};
 
 const getResponseMessage = (
     responseBody: unknown,
@@ -151,6 +129,34 @@ const CreateSetupForm = ({
         name: "takeProfits",
     });
 
+    const validatePrice = (
+        value: string,
+        required: boolean,
+    ) => {
+        const normalizedValue =
+            value.trim();
+
+        if (!normalizedValue) {
+            return required
+                ? locale.createSetup.priceRequired
+                : true;
+        }
+
+        if (
+            !PRICE_PATTERN.test(
+                normalizedValue,
+            )
+        ) {
+            return locale.createSetup.priceInvalid;
+        }
+
+        if (Number(normalizedValue) <= 0) {
+            return locale.createSetup.pricePositive;
+        }
+
+        return true;
+    };
+
     useEffect(() => {
         const controller =
             new AbortController();
@@ -175,7 +181,8 @@ const CreateSetupForm = ({
                     throw new Error(
                         getResponseMessage(
                             responseBody,
-                            "Не вдалося завантажити торгові пари",
+                            locale.createSetup
+                                .symbolsLoadError,
                         ),
                     );
                 }
@@ -183,10 +190,15 @@ const CreateSetupForm = ({
                 const symbols =
                     Array.isArray(responseBody)
                         ? responseBody
-                        : typeof responseBody === "object" &&
-                        responseBody !== null &&
-                        "data" in responseBody &&
-                        Array.isArray(responseBody.data)
+                        : typeof responseBody ===
+                        "object" &&
+                        responseBody !==
+                        null &&
+                        "data" in
+                        responseBody &&
+                        Array.isArray(
+                            responseBody.data,
+                        )
                             ? responseBody.data
                             : [];
 
@@ -195,10 +207,12 @@ const CreateSetupForm = ({
                         (
                             item,
                         ): item is BinanceSymbolResponseItem =>
-                            typeof item === "object" &&
+                            typeof item ===
+                            "object" &&
                             item !== null &&
                             "symbol" in item &&
-                            typeof item.symbol === "string",
+                            typeof item.symbol ===
+                            "string",
                     )
                     .map((item) => ({
                         value: item.symbol,
@@ -208,8 +222,10 @@ const CreateSetupForm = ({
                 setSymbolOptions(options);
             } catch (error) {
                 if (
-                    error instanceof DOMException &&
-                    error.name === "AbortError"
+                    error instanceof
+                    DOMException &&
+                    error.name ===
+                    "AbortError"
                 ) {
                     return;
                 }
@@ -217,7 +233,8 @@ const CreateSetupForm = ({
                 setSymbolsError(
                     error instanceof Error
                         ? error.message
-                        : "Не вдалося завантажити торгові пари",
+                        : locale.createSetup
+                            .symbolsLoadError,
                 );
             } finally {
                 setIsSymbolsLoading(false);
@@ -229,7 +246,9 @@ const CreateSetupForm = ({
         return () => {
             controller.abort();
         };
-    }, []);
+    }, [
+        locale.createSetup.symbolsLoadError,
+    ]);
 
     const handleCreateSetup = async (
         values: CreateSetupFormValues,
@@ -241,7 +260,8 @@ const CreateSetupForm = ({
             direction: values.direction,
             isActive: values.isActive,
             entries: values.entries.map(
-                (entry) => entry.value.trim(),
+                (entry) =>
+                    entry.value.trim(),
             ),
             takeProfits:
                 values.takeProfits.map(
@@ -249,7 +269,8 @@ const CreateSetupForm = ({
                         takeProfit.value.trim(),
                 ),
             stopLoss:
-                values.stopLoss.trim() || null,
+                values.stopLoss.trim() ||
+                null,
             note:
                 values.note.trim() || null,
         };
@@ -263,7 +284,9 @@ const CreateSetupForm = ({
                         "Content-Type":
                             "application/json",
                     },
-                    body: JSON.stringify(payload),
+                    body: JSON.stringify(
+                        payload,
+                    ),
                 },
             );
 
@@ -274,7 +297,8 @@ const CreateSetupForm = ({
                 setSubmitError(
                     getResponseMessage(
                         responseBody,
-                        "Не вдалося створити сетап",
+                        locale.createSetup
+                            .createError,
                     ),
                 );
 
@@ -285,7 +309,8 @@ const CreateSetupForm = ({
             onSuccessAction();
         } catch {
             setSubmitError(
-                "Не вдалося з'єднатися із сервером",
+                locale.createSetup
+                    .connectionError,
             );
         }
     };
@@ -303,19 +328,34 @@ const CreateSetupForm = ({
                     control={control}
                     rules={{
                         required:
-                            "Торгова пара є обов'язковою",
+                        locale.createSetup
+                            .symbolRequired,
                     }}
                     render={({field}) => (
                         <SearchableSelect
-                            label="Торгова пара"
-                            options={symbolOptions}
+                            label={
+                                locale.createSetup
+                                    .symbolLabel
+                            }
+                            options={
+                                symbolOptions
+                            }
                             value={field.value}
                             onChangeAction={
                                 field.onChange
                             }
-                            placeholder="Оберіть торгову пару"
-                            noOptionsMessage="Торгову пару не знайдено"
-                            loadingMessage="Завантаження торгових пар..."
+                            placeholder={
+                                locale.createSetup
+                                    .symbolPlaceholder
+                            }
+                            noOptionsMessage={
+                                locale.createSetup
+                                    .symbolNoOptions
+                            }
+                            loadingMessage={
+                                locale.createSetup
+                                    .symbolLoading
+                            }
                             error={
                                 errors.symbol
                                     ?.message ??
@@ -335,7 +375,11 @@ const CreateSetupForm = ({
                 <div className="grid gap-5 sm:grid-cols-2">
                     <fieldset>
                         <legend className="mb-2 text-sm font-medium text-[var(--color-text)]">
-                            Напрямок
+                            {
+                                locale.createSetup
+                                    .directionLabel
+                            }
+
                             <span className="ml-1 text-[var(--color-danger)]">
                                 *
                             </span>
@@ -367,7 +411,6 @@ const CreateSetupForm = ({
                                         text-[var(--color-text-secondary)]
                                         transition-colors
                                         peer-checked:border-[var(--color-success)]
-                                        peer-checked:bg-[color-mix(in_srgb,var(--color-success)_12%,transparent)]
                                         peer-checked:text-[var(--color-success)]
                                     "
                                 >
@@ -400,7 +443,6 @@ const CreateSetupForm = ({
                                         text-[var(--color-text-secondary)]
                                         transition-colors
                                         peer-checked:border-[var(--color-danger)]
-                                        peer-checked:bg-[color-mix(in_srgb,var(--color-danger)_12%,transparent)]
                                         peer-checked:text-[var(--color-danger)]
                                     "
                                 >
@@ -412,7 +454,10 @@ const CreateSetupForm = ({
 
                     <div>
                         <span className="mb-2 block text-sm font-medium text-[var(--color-text)]">
-                            Статус
+                            {
+                                locale.createSetup
+                                    .statusLabel
+                            }
                         </span>
 
                         <label
@@ -431,15 +476,15 @@ const CreateSetupForm = ({
                             "
                         >
                             <span className="text-sm text-[var(--color-text-secondary)]">
-                                Активний сетап
+                                {
+                                    locale.createSetup
+                                        .activeSetup
+                                }
                             </span>
 
                             <input
                                 type="checkbox"
-                                className="
-                                    size-4
-                                    accent-[var(--color-brand)]
-                                "
+                                className="size-4 accent-[var(--color-brand)]"
                                 {...register(
                                     "isActive",
                                 )}
@@ -453,11 +498,17 @@ const CreateSetupForm = ({
                 <div className="flex items-center justify-between gap-4">
                     <div>
                         <h3 className="font-semibold text-[var(--color-text)]">
-                            Рівні входу
+                            {
+                                locale.createSetup
+                                    .entriesTitle
+                            }
                         </h3>
 
                         <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                            Додайте від одного до десяти рівнів.
+                            {
+                                locale.createSetup
+                                    .entriesDescription
+                            }
                         </p>
                     </div>
 
@@ -497,7 +548,11 @@ const CreateSetupForm = ({
                             className="size-4"
                             aria-hidden="true"
                         />
-                        Додати
+
+                        {
+                            locale.createSetup
+                                .addEntry
+                        }
                     </button>
                 </div>
 
@@ -513,7 +568,12 @@ const CreateSetupForm = ({
                                         htmlFor={`entry-${index}`}
                                         className="mb-2 block text-sm font-medium text-[var(--color-text)]"
                                     >
-                                        Entry {index + 1}
+                                        {
+                                            locale
+                                                .createSetup
+                                                .entryLabel
+                                        }{" "}
+                                        {index + 1}
                                     </label>
 
                                     <div className="relative">
@@ -532,7 +592,7 @@ const CreateSetupForm = ({
                                                         (
                                                             value,
                                                         ) =>
-                                                            getPriceError(
+                                                            validatePrice(
                                                                 value,
                                                                 true,
                                                             ),
@@ -553,14 +613,16 @@ const CreateSetupForm = ({
                                                 transition-colors
                                                 placeholder:text-[var(--color-text-muted)]
                                                 focus:border-[var(--color-brand)]
-                                                focus:ring-2
-                                                focus:ring-[color-mix(in_srgb,var(--color-brand)_15%,transparent)]
                                             "
                                         />
 
                                         <button
                                             type="button"
-                                            aria-label="Очистити ціну входу"
+                                            aria-label={
+                                                locale
+                                                    .createSetup
+                                                    .clearEntry
+                                            }
                                             onClick={() =>
                                                 setValue(
                                                     `entries.${index}.value`,
@@ -610,7 +672,10 @@ const CreateSetupForm = ({
 
                                 <button
                                     type="button"
-                                    aria-label="Видалити рівень входу"
+                                    aria-label={
+                                        locale.createSetup
+                                            .deleteEntry
+                                    }
                                     disabled={
                                         entryFields.length ===
                                         1 ||
@@ -654,11 +719,17 @@ const CreateSetupForm = ({
                 <div className="flex items-center justify-between gap-4">
                     <div>
                         <h3 className="font-semibold text-[var(--color-text)]">
-                            Take Profit
+                            {
+                                locale.createSetup
+                                    .takeProfitsTitle
+                            }
                         </h3>
 
                         <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-                            Додайте цільові рівні фіксації прибутку.
+                            {
+                                locale.createSetup
+                                    .takeProfitsDescription
+                            }
                         </p>
                     </div>
 
@@ -698,7 +769,11 @@ const CreateSetupForm = ({
                             className="size-4"
                             aria-hidden="true"
                         />
-                        Додати
+
+                        {
+                            locale.createSetup
+                                .addTakeProfit
+                        }
                     </button>
                 </div>
 
@@ -714,7 +789,12 @@ const CreateSetupForm = ({
                                         htmlFor={`take-profit-${index}`}
                                         className="mb-2 block text-sm font-medium text-[var(--color-text)]"
                                     >
-                                        TP {index + 1}
+                                        {
+                                            locale
+                                                .createSetup
+                                                .takeProfitLabel
+                                        }{" "}
+                                        {index + 1}
                                     </label>
 
                                     <div className="relative">
@@ -733,7 +813,7 @@ const CreateSetupForm = ({
                                                         (
                                                             value,
                                                         ) =>
-                                                            getPriceError(
+                                                            validatePrice(
                                                                 value,
                                                                 true,
                                                             ),
@@ -754,14 +834,16 @@ const CreateSetupForm = ({
                                                 transition-colors
                                                 placeholder:text-[var(--color-text-muted)]
                                                 focus:border-[var(--color-brand)]
-                                                focus:ring-2
-                                                focus:ring-[color-mix(in_srgb,var(--color-brand)_15%,transparent)]
                                             "
                                         />
 
                                         <button
                                             type="button"
-                                            aria-label="Очистити Take Profit"
+                                            aria-label={
+                                                locale
+                                                    .createSetup
+                                                    .clearTakeProfit
+                                            }
                                             onClick={() =>
                                                 setValue(
                                                     `takeProfits.${index}.value`,
@@ -811,7 +893,10 @@ const CreateSetupForm = ({
 
                                 <button
                                     type="button"
-                                    aria-label="Видалити Take Profit"
+                                    aria-label={
+                                        locale.createSetup
+                                            .deleteTakeProfit
+                                    }
                                     disabled={
                                         takeProfitFields.length ===
                                         1 ||
@@ -857,7 +942,10 @@ const CreateSetupForm = ({
                         htmlFor="stop-loss"
                         className="mb-2 block text-sm font-medium text-[var(--color-text)]"
                     >
-                        Stop Loss
+                        {
+                            locale.createSetup
+                                .stopLossLabel
+                        }
                     </label>
 
                     <div className="relative">
@@ -870,8 +958,10 @@ const CreateSetupForm = ({
                             {...register(
                                 "stopLoss",
                                 {
-                                    validate: (value) =>
-                                        getPriceError(
+                                    validate: (
+                                        value,
+                                    ) =>
+                                        validatePrice(
                                             value,
                                             false,
                                         ),
@@ -892,14 +982,15 @@ const CreateSetupForm = ({
                                 transition-colors
                                 placeholder:text-[var(--color-text-muted)]
                                 focus:border-[var(--color-brand)]
-                                focus:ring-2
-                                focus:ring-[color-mix(in_srgb,var(--color-brand)_15%,transparent)]
                             "
                         />
 
                         <button
                             type="button"
-                            aria-label="Очистити Stop Loss"
+                            aria-label={
+                                locale.createSetup
+                                    .clearStopLoss
+                            }
                             onClick={() =>
                                 setValue(
                                     "stopLoss",
@@ -932,7 +1023,8 @@ const CreateSetupForm = ({
                         </button>
                     </div>
 
-                    {errors.stopLoss?.message ? (
+                    {errors.stopLoss
+                        ?.message ? (
                         <p className="mt-1.5 text-sm text-[var(--color-danger)]">
                             {
                                 errors.stopLoss
@@ -947,7 +1039,10 @@ const CreateSetupForm = ({
                         htmlFor="setup-note"
                         className="mb-2 block text-sm font-medium text-[var(--color-text)]"
                     >
-                        Нотатка
+                        {
+                            locale.createSetup
+                                .noteLabel
+                        }
                     </label>
 
                     <textarea
@@ -955,12 +1050,17 @@ const CreateSetupForm = ({
                         rows={4}
                         maxLength={1000}
                         disabled={isSubmitting}
-                        placeholder="Додайте опис або коментар до сетапу"
+                        placeholder={
+                            locale.createSetup
+                                .notePlaceholder
+                        }
                         {...register("note", {
                             maxLength: {
                                 value: 1000,
                                 message:
-                                    "Нотатка не може містити більше 1000 символів",
+                                locale
+                                    .createSetup
+                                    .noteMaxLength,
                             },
                         })}
                         className="
@@ -978,8 +1078,6 @@ const CreateSetupForm = ({
                             transition-colors
                             placeholder:text-[var(--color-text-muted)]
                             focus:border-[var(--color-brand)]
-                            focus:ring-2
-                            focus:ring-[color-mix(in_srgb,var(--color-brand)_15%,transparent)]
                         "
                     />
 
@@ -998,7 +1096,6 @@ const CreateSetupForm = ({
                         rounded-xl
                         border
                         border-[var(--color-danger)]
-                        bg-[color-mix(in_srgb,var(--color-danger)_10%,transparent)]
                         px-4
                         py-3
                         text-sm
@@ -1041,7 +1138,7 @@ const CreateSetupForm = ({
                         disabled:opacity-50
                     "
                 >
-                    Скасувати
+                    {locale.createSetup.cancel}
                 </button>
 
                 <button
@@ -1065,8 +1162,10 @@ const CreateSetupForm = ({
                     "
                 >
                     {isSubmitting
-                        ? "Створення..."
-                        : "Створити сетап"}
+                        ? locale.createSetup
+                            .submitting
+                        : locale.createSetup
+                            .submit}
                 </button>
             </footer>
         </form>

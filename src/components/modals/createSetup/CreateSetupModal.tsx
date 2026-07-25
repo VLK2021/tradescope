@@ -85,6 +85,7 @@ const CreateSetupModal = ({
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="create-setup-modal-title"
+                aria-describedby="create-setup-modal-description"
                 className="
                     flex
                     max-h-[calc(100dvh-2rem)]
@@ -99,9 +100,7 @@ const CreateSetupModal = ({
                     text-[var(--color-text)]
                     shadow-2xl
                 "
-                onClick={
-                    handleDialogClick
-                }
+                onClick={handleDialogClick}
             >
                 <header
                     className="
@@ -127,23 +126,25 @@ const CreateSetupModal = ({
                                 sm:text-xl
                             "
                         >
-                            {
-                                locale.createSetup
-                                    .title
-                            }
+                            {locale.createSetup.title}
                         </h2>
 
-                        <p className="mt-1 text-sm leading-5 text-[var(--color-text-secondary)]">
-                            Додайте торгову пару, напрямок і цінові рівні сетапу.
+                        <p
+                            id="create-setup-modal-description"
+                            className="
+                                mt-1
+                                text-sm
+                                leading-5
+                                text-[var(--color-text-secondary)]
+                            "
+                        >
+                            {locale.createSetup.description}
                         </p>
                     </div>
 
                     <button
                         type="button"
-                        aria-label={
-                            locale.createSetup
-                                .close
-                        }
+                        aria-label={locale.createSetup.close}
                         onClick={onClose}
                         className="
                             flex
@@ -173,12 +174,8 @@ const CreateSetupModal = ({
 
                 <div className="overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
                     <CreateSetupForm
-                        onSuccessAction={
-                            onClose
-                        }
-                        onCancelAction={
-                            onClose
-                        }
+                        onSuccessAction={onClose}
+                        onCancelAction={onClose}
                     />
                 </div>
             </div>
