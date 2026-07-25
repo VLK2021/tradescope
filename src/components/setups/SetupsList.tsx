@@ -30,28 +30,18 @@ const SetupsList = ({
                     border
                     border-dashed
                     border-[var(--color-border)]
-                    bg-[var(--color-card)]
                     px-6
                     py-12
                     text-center
                 "
             >
-                <div
+                <Inbox
                     className="
-                        flex
-                        size-12
-                        items-center
-                        justify-center
-                        rounded-2xl
-                        bg-[var(--color-background)]
+                        size-7
                         text-[var(--color-text-muted)]
                     "
-                >
-                    <Inbox
-                        className="size-6"
-                        aria-hidden="true"
-                    />
-                </div>
+                    aria-hidden="true"
+                />
 
                 <h2
                     className="
@@ -63,21 +53,6 @@ const SetupsList = ({
                 >
                     Сетапів поки немає
                 </h2>
-
-                <p
-                    className="
-                        mt-2
-                        max-w-md
-                        text-sm
-                        leading-6
-                        text-[var(--color-text-secondary)]
-                    "
-                >
-                    Створіть перший торговий
-                    сетап за допомогою кнопки
-                    у верхній частині
-                    сторінки.
-                </p>
             </div>
         );
     }
@@ -88,8 +63,8 @@ const SetupsList = ({
                 grid
                 items-start
                 gap-4
-                sm:grid-cols-2
-                lg:grid-cols-3
+                md:grid-cols-2
+                xl:grid-cols-3
             "
         >
             {setups.map((setup) => (

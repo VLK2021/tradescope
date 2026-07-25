@@ -8,21 +8,23 @@ import type {
 } from "@/src/types/setup";
 
 import {
-    SetupCardActions,
-} from "./SetupCardActions";
+    SetupStatusToggle,
+} from "./SetupStatusToggle";
 
 type SetupCardHeaderProps = {
     symbol: string;
     direction: SetupDirection;
     isActive: boolean;
-    onDeleteAction: () => void;
+    isUpdatingStatus: boolean;
+    onToggleStatusAction: () => void;
 };
 
 const SetupCardHeader = ({
                              symbol,
                              direction,
                              isActive,
-                             onDeleteAction,
+                             isUpdatingStatus,
+                             onToggleStatusAction,
                          }: SetupCardHeaderProps) => {
     const isLong =
         direction === "LONG";
@@ -31,111 +33,85 @@ const SetupCardHeader = ({
         <header
             className="
                 flex
-                items-start
-                justify-between
+                min-w-0
+                items-center
                 gap-3
-                border-b
-                border-[var(--color-border)]
-                px-4
-                py-4
             "
         >
-            <div className="min-w-0">
-                <div
-                    className="
-                        flex
-                        flex-wrap
-                        items-center
-                        gap-2
-                    "
-                >
-                    <h2
-                        className="
-                            min-w-0
-                            overflow-hidden
-                            text-ellipsis
-                            whitespace-nowrap
-                            text-lg
-                            font-semibold
-                            text-[var(--color-text)]
-                        "
-                        title={symbol}
-                    >
-                        {symbol}
-                    </h2>
-
-                    <span
-                        className={`
-                            inline-flex
-                            items-center
-                            gap-1
-                            rounded-full
-                            px-2
-                            py-1
-                            text-xs
-                            font-semibold
-                            ${
-                            isLong
-                                ? `
-                                        bg-[color-mix(in_srgb,var(--color-success)_12%,transparent)]
-                                        text-[var(--color-success)]
-                                    `
-                                : `
-                                        bg-[color-mix(in_srgb,var(--color-danger)_12%,transparent)]
-                                        text-[var(--color-danger)]
-                                    `
-                        }
-                        `}
-                    >
-                        {isLong ? (
-                            <TrendingUp
-                                className="size-3"
-                                aria-hidden="true"
-                            />
-                        ) : (
-                            <TrendingDown
-                                className="size-3"
-                                aria-hidden="true"
-                            />
-                        )}
-
-                        {direction}
-                    </span>
-                </div>
-
-                <div
-                    className="
-                        mt-2
-                        inline-flex
-                        items-center
-                        gap-1.5
-                        text-xs
-                        text-[var(--color-text-muted)]
-                    "
-                >
-                    <span
-                        className={`
-                            size-1.5
-                            rounded-full
-                            ${
-                            isActive
-                                ? "bg-[var(--color-success)]"
-                                : "bg-[var(--color-text-muted)]"
-                        }
-                        `}
+            <div
+                className={`
+                    flex
+                    size-9
+                    shrink-0
+                    items-center
+                    justify-center
+                    rounded-full
+                    ${
+                    isLong
+                        ? `
+                                bg-[color-mix(in_srgb,var(--color-success)_12%,var(--color-surface))]
+                                text-[var(--color-success)]
+                            `
+                        : `
+                                bg-[color-mix(in_srgb,var(--color-danger)_12%,var(--color-surface))]
+                                text-[var(--color-danger)]
+                            `
+                }
+                `}
+            >
+                {isLong ? (
+                    <TrendingUp
+                        className="size-4"
+                        aria-hidden="true"
                     />
-
-                    {isActive
-                        ? "Активний"
-                        : "Неактивний"}
-                </div>
+                ) : (
+                    <TrendingDown
+                        className="size-4"
+                        aria-hidden="true"
+                    />
+                )}
             </div>
 
-            <SetupCardActions
-                onDeleteAction={
-                    onDeleteAction
+            <h2
+                className="
+                    min-w-0
+                    flex-1
+                    overflow-hidden
+                    text-ellipsis
+                    whitespace-nowrap
+                    text-base
+                    font-semibold
+                    text-[var(--color-text)]
+                "
+                title={symbol}
+            >
+                {symbol}
+            </h2>
+
+            <SetupStatusToggle
+                isActive={isActive}
+                isUpdating={
+                    isUpdatingStatus
+                }
+                onToggleAction={
+                    onToggleStatusAction
                 }
             />
+
+            <span
+                className={`
+                    shrink-0
+                    text-sm
+                    font-semibold
+                    ${
+                    isLong
+                        ? "text-[var(--color-success)]"
+                        : "text-[var(--color-danger)]"
+                }
+                `}
+            >
+                {direction}
+            </span>
         </header>
     );
 };
