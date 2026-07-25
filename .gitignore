@@ -77,3 +77,7 @@ docker-compose.override.yml
 # Prisma generated client
 /src/generated/prisma
 /src/generated/prisma
+
+.agents/
+.claude/
+.windsurf/
