@@ -1,5 +1,6 @@
 import type { Prisma } from "../generated/prisma/client";
 
+import { ApiError } from "@/src/helpers";
 import { prisma } from "../helpers/prisma";
 import type {
     CreateSetupInput,
@@ -7,6 +8,7 @@ import type {
     SetupStatusInput,
     UpdateSetupInput,
 } from "../schemas/setup.schema";
+import { validateSetupMarketData } from "@/src/validators";
 
 const buildSetupWhere = (
     query: SetupQueryInput,
@@ -22,7 +24,8 @@ const buildSetupWhere = (
     }
 
     if (query.direction !== "all") {
-        where.direction = query.direction;
+        where.direction =
+            query.direction;
     }
 
     if (query.symbol) {
@@ -57,26 +60,56 @@ const buildSetupOrderBy = (
     }
 };
 
-export const getSetups = async (query: SetupQueryInput) => {
-    const where = buildSetupWhere(query);
-    const orderBy = buildSetupOrderBy(query);
+const getExistingSetupOrThrow = async (
+    id: string,
+) => {
+    const setup =
+        await prisma.setup.findUnique({
+            where: {
+                id,
+            },
+        });
 
-    const skip = (query.page - 1) * query.limit;
+    if (!setup) {
+        throw new ApiError(
+            "Сетап не знайдено",
+            404,
+        );
+    }
 
-    const [setups, totalItems] = await prisma.$transaction([
-        prisma.setup.findMany({
-            where,
-            orderBy,
-            skip,
-            take: query.limit,
-        }),
+    return setup;
+};
 
-        prisma.setup.count({
-            where,
-        }),
-    ]);
+export const getSetups = async (
+    query: SetupQueryInput,
+) => {
+    const where =
+        buildSetupWhere(query);
 
-    const totalPages = Math.ceil(totalItems / query.limit);
+    const orderBy =
+        buildSetupOrderBy(query);
+
+    const skip =
+        (query.page - 1) *
+        query.limit;
+
+    const [setups, totalItems] =
+        await prisma.$transaction([
+            prisma.setup.findMany({
+                where,
+                orderBy,
+                skip,
+                take: query.limit,
+            }),
+
+            prisma.setup.count({
+                where,
+            }),
+        ]);
+
+    const totalPages = Math.ceil(
+        totalItems / query.limit,
+    );
 
     return {
         data: setups,
@@ -86,13 +119,16 @@ export const getSetups = async (query: SetupQueryInput) => {
             limit: query.limit,
             totalItems,
             totalPages,
-            hasNextPage: query.page < totalPages,
-            hasPreviousPage: query.page > 1,
+            hasNextPage:
+                query.page < totalPages,
+            hasPreviousPage:
+                query.page > 1,
         },
 
         filters: {
             status: query.status,
-            direction: query.direction,
+            direction:
+            query.direction,
             symbol: query.symbol,
         },
 
@@ -103,7 +139,9 @@ export const getSetups = async (query: SetupQueryInput) => {
     };
 };
 
-export const getSetupById = async (id: string) => {
+export const getSetupById = async (
+    id: string,
+) => {
     return prisma.setup.findUnique({
         where: {
             id,
@@ -111,16 +149,34 @@ export const getSetupById = async (id: string) => {
     });
 };
 
-export const createSetup = async (data: CreateSetupInput) => {
+export const createSetup = async (
+    data: CreateSetupInput,
+) => {
+    const symbol =
+        await validateSetupMarketData({
+            symbol: data.symbol,
+            entries: data.entries,
+            takeProfits:
+            data.takeProfits,
+            stopLoss:
+            data.stopLoss,
+        });
+
     return prisma.setup.create({
         data: {
-            symbol: data.symbol,
-            direction: data.direction,
-            isActive: data.isActive,
-            entries: data.entries,
-            takeProfits: data.takeProfits,
-            stopLoss: data.stopLoss,
-            note: data.note,
+            symbol,
+            direction:
+            data.direction,
+            isActive:
+            data.isActive,
+            entries:
+            data.entries,
+            takeProfits:
+            data.takeProfits,
+            stopLoss:
+            data.stopLoss,
+            note:
+            data.note,
         },
     });
 };
@@ -129,11 +185,41 @@ export const updateSetup = async (
     id: string,
     data: UpdateSetupInput,
 ) => {
+    const currentSetup =
+        await getExistingSetupOrThrow(
+            id,
+        );
+
+    const symbol =
+        await validateSetupMarketData({
+            symbol:
+                data.symbol ??
+                currentSetup.symbol,
+
+            entries:
+                data.entries ??
+                currentSetup.entries,
+
+            takeProfits:
+                data.takeProfits ??
+                currentSetup.takeProfits,
+
+            stopLoss:
+                data.stopLoss !==
+                undefined
+                    ? data.stopLoss
+                    : currentSetup.stopLoss,
+        });
+
     return prisma.setup.update({
         where: {
             id,
         },
-        data,
+
+        data: {
+            ...data,
+            symbol,
+        },
     });
 };
 
@@ -145,13 +231,17 @@ export const updateSetupStatus = async (
         where: {
             id,
         },
+
         data: {
-            isActive: data.isActive,
+            isActive:
+            data.isActive,
         },
     });
 };
 
-export const deleteSetup = async (id: string) => {
+export const deleteSetup = async (
+    id: string,
+) => {
     return prisma.setup.delete({
         where: {
             id,
