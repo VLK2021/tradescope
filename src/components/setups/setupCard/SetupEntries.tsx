@@ -1,3 +1,9 @@
+"use client";
+
+import {
+    useLanguage,
+} from "@/src/context";
+
 import {
     SetupEntryRow,
 } from "./SetupEntryRow";
@@ -11,6 +17,8 @@ const SetupEntries = ({
                           entries,
                           currentPrice,
                       }: SetupEntriesProps) => {
+    const {locale} = useLanguage();
+
     return (
         <section
             className="
@@ -27,10 +35,10 @@ const SetupEntries = ({
                     text-[var(--color-text-secondary)]
                 "
             >
-                Входи
+                {locale.setups.entries}
             </h3>
 
-            <div className="space-y-0">
+            <div>
                 {entries.map(
                     (entry, index) => (
                         <SetupEntryRow
@@ -39,6 +47,10 @@ const SetupEntries = ({
                             price={entry}
                             currentPrice={
                                 currentPrice
+                            }
+                            currency={
+                                locale.setups
+                                    .currency
                             }
                         />
                     ),

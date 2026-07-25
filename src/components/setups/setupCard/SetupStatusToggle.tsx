@@ -1,6 +1,12 @@
+"use client";
+
 import {
     LoaderCircle,
 } from "lucide-react";
+
+import {
+    useLanguage,
+} from "@/src/context";
 
 type SetupStatusToggleProps = {
     isActive: boolean;
@@ -13,13 +19,15 @@ const SetupStatusToggle = ({
                                isUpdating,
                                onToggleAction,
                            }: SetupStatusToggleProps) => {
+    const {locale} = useLanguage();
+
     const label = isActive
-        ? "Активний"
-        : "Неактивний";
+        ? locale.setups.active
+        : locale.setups.inactive;
 
     const actionLabel = isActive
-        ? "Зробити сетап неактивним"
-        : "Зробити сетап активним";
+        ? locale.setups.makeInactive
+        : locale.setups.makeActive;
 
     return (
         <button
@@ -58,6 +66,7 @@ const SetupStatusToggle = ({
                             border-[var(--color-border)]
                             bg-transparent
                             text-[var(--color-text-muted)]
+                            hover:border-[var(--color-text-muted)]
                             hover:text-[var(--color-text)]
                         `
             }
@@ -65,7 +74,10 @@ const SetupStatusToggle = ({
         >
             {isUpdating ? (
                 <LoaderCircle
-                    className="size-3 animate-spin"
+                    className="
+                        size-3
+                        animate-spin
+                    "
                     aria-hidden="true"
                 />
             ) : (

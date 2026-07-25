@@ -35,6 +35,7 @@ import {
 import {
     SetupTargets,
 } from "./SetupTargets";
+import {useLanguage} from "@/src/context";
 
 type SetupCardProps = {
     setup: SetupItem;
@@ -44,6 +45,8 @@ const SetupCard = ({
                        setup,
                    }: SetupCardProps) => {
     const router = useRouter();
+
+    const {locale} = useLanguage();
 
     const [
         isDeleteModalOpen,
@@ -118,7 +121,7 @@ const SetupCard = ({
                 );
 
                 setStatusError(
-                    "Не вдалося змінити статус сетапу",
+                    locale.setups.statusUpdateError,
                 );
             } finally {
                 setIsUpdatingStatus(
@@ -199,7 +202,7 @@ const SetupCard = ({
                                 text-[var(--color-text-muted)]
                             "
                         >
-                            Поточна ціна
+                           {locale.setups.currentPrice}
                         </span>
 
                         <span

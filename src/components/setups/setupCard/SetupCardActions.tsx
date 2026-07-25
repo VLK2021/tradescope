@@ -1,7 +1,13 @@
+"use client";
+
 import {
     Pencil,
     Trash2,
 } from "lucide-react";
+
+import {
+    useLanguage,
+} from "@/src/context";
 
 type SetupCardActionsProps = {
     onDeleteAction: () => void;
@@ -10,6 +16,8 @@ type SetupCardActionsProps = {
 const SetupCardActions = ({
                               onDeleteAction,
                           }: SetupCardActionsProps) => {
+    const {locale} = useLanguage();
+
     return (
         <div
             className="
@@ -26,8 +34,13 @@ const SetupCardActions = ({
             <button
                 type="button"
                 disabled
-                aria-label="Редагувати сетап"
-                title="Редагування буде додано пізніше"
+                aria-label={
+                    locale.setups.edit
+                }
+                title={
+                    locale.setups
+                        .editUnavailable
+                }
                 className="
                     flex
                     size-9
@@ -47,8 +60,12 @@ const SetupCardActions = ({
 
             <button
                 type="button"
-                aria-label="Видалити сетап"
-                title="Видалити сетап"
+                aria-label={
+                    locale.setups.delete
+                }
+                title={
+                    locale.setups.delete
+                }
                 onClick={onDeleteAction}
                 className="
                     flex
@@ -58,10 +75,10 @@ const SetupCardActions = ({
                     justify-center
                     rounded-lg
                     text-[var(--color-danger)]
-                    transition-all
+                    transition-colors
                     hover:bg-[color-mix(in_srgb,var(--color-danger)_12%,transparent)]
                     hover:text-[var(--color-danger)]
-                    active:scale-95
+                    active:bg-[color-mix(in_srgb,var(--color-danger)_18%,transparent)]
                 "
             >
                 <Trash2

@@ -9,21 +9,26 @@ type SetupEntryRowProps = {
     index: number;
     price: string;
     currentPrice: number | null;
+    currency: string;
 };
+
+const PERCENT_FRACTION_DIGITS = 3;
 
 const formatSignedPercent = (
     value: number,
 ): string => {
-    const sign =
-        value > 0 ? "+" : "";
+    const sign = value > 0 ? "+" : "";
 
-    return `${sign}${value.toFixed(3)}%`;
+    return `${sign}${value.toFixed(
+        PERCENT_FRACTION_DIGITS,
+    )}%`;
 };
 
 const SetupEntryRow = ({
                            index,
                            price,
                            currentPrice,
+                           currency,
                        }: SetupEntryRowProps) => {
     const distance =
         calculatePriceDistance({
@@ -31,22 +36,39 @@ const SetupEntryRow = ({
             levelPrice: price,
         });
 
-    const isPositive =
-        distance !== null &&
-        distance.percent > 0;
+    const formattedPercent =
+        distance === null
+            ? "—"
+            : formatSignedPercent(
+                distance.percent,
+            );
 
-    const isNegative =
-        distance !== null &&
-        distance.percent < 0;
+    const formattedDifference =
+        distance === null
+            ? "—"
+            : `(${formatSetupPrice(
+                Math.abs(
+                    distance.priceDifference,
+                ),
+            )} ${currency})`;
+
+    const percentClassName =
+        distance === null
+            ? "text-[var(--color-text-muted)]"
+            : distance.percent > 0
+                ? "text-[var(--color-success)]"
+                : distance.percent < 0
+                    ? "text-[var(--color-danger)]"
+                    : "text-[var(--color-text-muted)]";
 
     return (
         <div
             className="
                 grid
                 min-w-0
-                grid-cols-[24px_minmax(74px,1fr)_68px_minmax(82px,auto)]
+                grid-cols-[24px_minmax(0,1fr)_9ch_18ch]
                 items-center
-                gap-2
+                gap-x-2
                 py-1.5
             "
         >
@@ -54,6 +76,7 @@ const SetupEntryRow = ({
                 className="
                     flex
                     size-6
+                    shrink-0
                     items-center
                     justify-center
                     rounded-full
@@ -85,30 +108,26 @@ const SetupEntryRow = ({
 
             <span
                 className={`
+                    block
+                    w-[9ch]
+                    justify-self-end
+                    whitespace-nowrap
                     text-right
                     font-mono
                     text-xs
                     font-semibold
                     tabular-nums
-                    ${
-                    isPositive
-                        ? "text-[var(--color-success)]"
-                        : isNegative
-                            ? "text-[var(--color-danger)]"
-                            : "text-[var(--color-text-muted)]"
-                }
+                    ${percentClassName}
                 `}
             >
-                {distance
-                    ? formatSignedPercent(
-                        distance.percent,
-                    )
-                    : "—"}
+                {formattedPercent}
             </span>
 
             <span
                 className="
-                    min-w-0
+                    block
+                    w-[18ch]
+                    justify-self-end
                     overflow-hidden
                     text-ellipsis
                     whitespace-nowrap
@@ -118,21 +137,9 @@ const SetupEntryRow = ({
                     tabular-nums
                     text-[var(--color-text-muted)]
                 "
-                title={
-                    distance
-                        ? `${Math.abs(
-                            distance.priceDifference,
-                        )} USDT`
-                        : undefined
-                }
+                title={formattedDifference}
             >
-                {distance
-                    ? `(${formatSetupPrice(
-                        Math.abs(
-                            distance.priceDifference,
-                        ),
-                    )} USDT)`
-                    : "—"}
+                {formattedDifference}
             </span>
         </div>
     );

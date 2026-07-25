@@ -72,12 +72,29 @@ const en = {
     setups: {
         active: "Active",
         inactive: "Inactive",
-        entries: "Entry levels",
+
+        makeActive:
+            "Make setup active",
+        makeInactive:
+            "Make setup inactive",
+
+        currentPrice: "Current price",
+        entries: "Entries",
         takeProfits: "Take Profit",
         stopLoss: "Stop Loss",
         note: "Note",
+        withoutNote: "No note",
+
+        currency: "USDT",
+
         edit: "Edit setup",
+        editUnavailable:
+            "Editing will be added later",
         delete: "Delete setup",
+
+        statusUpdateError:
+            "Failed to update setup status",
+
         emptyTitle: "No setups yet",
         emptyDescription:
             "Create your first trading setup using the button at the top of the page.",

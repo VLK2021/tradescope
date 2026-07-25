@@ -72,13 +72,31 @@ const uk = {
     setups: {
         active: "Активний",
         inactive: "Неактивний",
-        entries: "Рівні входу",
+
+        makeActive:
+            "Зробити сетап активним",
+        makeInactive:
+            "Зробити сетап неактивним",
+
+        currentPrice: "Поточна ціна",
+        entries: "Входи",
         takeProfits: "Take Profit",
         stopLoss: "Stop Loss",
         note: "Нотатка",
+        withoutNote: "Без нотатки",
+
+        currency: "USDT",
+
         edit: "Редагувати сетап",
+        editUnavailable:
+            "Редагування буде додано пізніше",
         delete: "Видалити сетап",
-        emptyTitle: "Сетапів поки немає",
+
+        statusUpdateError:
+            "Не вдалося змінити статус сетапу",
+
+        emptyTitle:
+            "Сетапів поки немає",
         emptyDescription:
             "Створіть перший торговий сетап за допомогою кнопки у верхній частині сторінки.",
     },
