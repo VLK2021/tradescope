@@ -64,6 +64,40 @@ const en = {
         connectionError:
             "Failed to connect to the server",
     },
+
+    common: {
+        locale: "en-US",
+    },
+
+    setups: {
+        active: "Active",
+        inactive: "Inactive",
+        entries: "Entry levels",
+        takeProfits: "Take Profit",
+        stopLoss: "Stop Loss",
+        note: "Note",
+        edit: "Edit setup",
+        delete: "Delete setup",
+        emptyTitle: "No setups yet",
+        emptyDescription:
+            "Create your first trading setup using the button at the top of the page.",
+    },
+
+    deleteSetup: {
+        title: "Delete setup",
+        description:
+            "Are you sure you want to delete the setup",
+        warning:
+            "This action cannot be undone. The setup will be permanently removed from the database.",
+        close: "Close delete window",
+        cancel: "Cancel",
+        delete: "Delete",
+        deleting: "Deleting...",
+        deleteError:
+            "Failed to delete the setup",
+        connectionError:
+            "Failed to connect to the server",
+    },
 };
 
 export default en;

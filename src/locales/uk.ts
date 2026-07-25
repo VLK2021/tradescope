@@ -64,6 +64,40 @@ const uk = {
         connectionError:
             "Не вдалося з'єднатися із сервером",
     },
+
+    common: {
+        locale: "uk-UA",
+    },
+
+    setups: {
+        active: "Активний",
+        inactive: "Неактивний",
+        entries: "Рівні входу",
+        takeProfits: "Take Profit",
+        stopLoss: "Stop Loss",
+        note: "Нотатка",
+        edit: "Редагувати сетап",
+        delete: "Видалити сетап",
+        emptyTitle: "Сетапів поки немає",
+        emptyDescription:
+            "Створіть перший торговий сетап за допомогою кнопки у верхній частині сторінки.",
+    },
+
+    deleteSetup: {
+        title: "Видалити сетап",
+        description:
+            "Ви дійсно хочете видалити сетап",
+        warning:
+            "Цю дію неможливо скасувати. Сетап буде остаточно видалено з бази даних.",
+        close: "Закрити вікно видалення",
+        cancel: "Скасувати",
+        delete: "Видалити",
+        deleting: "Видалення...",
+        deleteError:
+            "Не вдалося видалити сетап",
+        connectionError:
+            "Не вдалося з'єднатися із сервером",
+    },
 };
 
 export default uk;
