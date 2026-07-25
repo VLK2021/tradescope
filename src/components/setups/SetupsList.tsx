@@ -6,7 +6,9 @@ import type {
     SetupItem,
 } from "@/src/types/setup";
 
-import {SetupCard} from "./SetupCard";
+import {
+    SetupCard,
+} from "./setupCard";
 
 type SetupsListProps = {
     setups: SetupItem[];
@@ -73,7 +75,8 @@ const SetupsList = ({
                 >
                     Створіть перший торговий
                     сетап за допомогою кнопки
-                    у верхній частині сторінки.
+                    у верхній частині
+                    сторінки.
                 </p>
             </div>
         );
@@ -83,10 +86,10 @@ const SetupsList = ({
         <div
             className="
                 grid
-                auto-rows-max
                 items-start
-                gap-5
-                xl:grid-cols-2
+                gap-4
+                sm:grid-cols-2
+                lg:grid-cols-3
             "
         >
             {setups.map((setup) => (
