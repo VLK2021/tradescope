@@ -3,15 +3,15 @@ import { NextRequest, NextResponse } from "next/server";
 import {
     createSuccessResponse,
     handleApiError,
-} from "../../../helpers/api.helpers";
+} from "@/src/helpers";
 import {
     createSetupSchema,
     setupQuerySchema,
-} from "../../../schemas/setup.schema";
+} from "@/src/schemas/setup.schema";
 import {
     createSetup,
     getSetups,
-} from "../../../services/setup.service";
+} from "@/src/services/setup.service";
 
 export const GET = async (request: NextRequest) => {
     try {

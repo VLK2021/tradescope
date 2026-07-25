@@ -4,18 +4,18 @@ import {
     createMessageResponse,
     createSuccessResponse,
     handleApiError,
-} from "../../../../helpers/api.helpers";
+} from "@/src/helpers";
 import {
     setupIdSchema,
     setupStatusSchema,
     updateSetupSchema,
-} from "../../../../schemas/setup.schema";
+} from "@/src/schemas/setup.schema";
 import {
     deleteSetup,
     getSetupById,
     updateSetup,
     updateSetupStatus,
-} from "../../../../services/setup.service";
+} from "@/src/services/setup.service";
 
 type SetupRouteContext = {
     params: Promise<{
