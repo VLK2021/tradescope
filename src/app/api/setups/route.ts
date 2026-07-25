@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ZodError } from "zod";
 
+import {
+    createSuccessResponse,
+    handleApiError,
+} from "../../../helpers/api.helpers";
 import {
     createSetupSchema,
     setupQuerySchema,
@@ -9,21 +12,6 @@ import {
     createSetup,
     getSetups,
 } from "../../../services/setup.service";
-
-const getValidationErrorResponse = (error: ZodError) => {
-    return NextResponse.json(
-        {
-            message: "Передані дані не пройшли валідацію",
-            errors: error.issues.map((issue) => ({
-                field: issue.path.join("."),
-                message: issue.message,
-            })),
-        },
-        {
-            status: 400,
-        },
-    );
-};
 
 export const GET = async (request: NextRequest) => {
     try {
@@ -36,19 +24,9 @@ export const GET = async (request: NextRequest) => {
 
         return NextResponse.json(result);
     } catch (error) {
-        if (error instanceof ZodError) {
-            return getValidationErrorResponse(error);
-        }
-
-        console.error("Failed to get setups:", error);
-
-        return NextResponse.json(
-            {
-                message: "Не вдалося отримати список сетапів",
-            },
-            {
-                status: 500,
-            },
+        return handleApiError(
+            error,
+            "Не вдалося отримати список сетапів",
         );
     }
 };
@@ -60,40 +38,15 @@ export const POST = async (request: NextRequest) => {
 
         const setup = await createSetup(validatedData);
 
-        return NextResponse.json(
-            {
-                message: "Сетап успішно створено",
-                data: setup,
-            },
-            {
-                status: 201,
-            },
+        return createSuccessResponse(
+            setup,
+            201,
+            "Сетап успішно створено",
         );
     } catch (error) {
-        if (error instanceof ZodError) {
-            return getValidationErrorResponse(error);
-        }
-
-        if (error instanceof SyntaxError) {
-            return NextResponse.json(
-                {
-                    message: "Тіло запиту містить некоректний JSON",
-                },
-                {
-                    status: 400,
-                },
-            );
-        }
-
-        console.error("Failed to create setup:", error);
-
-        return NextResponse.json(
-            {
-                message: "Не вдалося створити сетап",
-            },
-            {
-                status: 500,
-            },
+        return handleApiError(
+            error,
+            "Не вдалося створити сетап",
         );
     }
 };
