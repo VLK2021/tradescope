@@ -1,4 +1,4 @@
-import {AddSetupButton} from "./AddSetupButton";
+import {AddSetupControl} from "./AddSetupControl";
 import {HeaderBrand} from "./HeaderBrand";
 import {HeaderControls} from "./HeaderControls";
 
@@ -51,7 +51,7 @@ const Header = () => {
                         md:flex-1
                     "
                 >
-                    <AddSetupButton />
+                    <AddSetupControl />
                 </div>
 
                 <div className="flex flex-1 justify-end">
