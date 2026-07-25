@@ -2,62 +2,64 @@
 
 import {Moon, Sun} from "lucide-react";
 
-import {useTheme} from "@/src/context";
+import {useLanguage, useTheme} from "@/src/context";
 
 const ThemeSwitcher = () => {
     const {theme, toggleTheme} = useTheme();
+    const {locale} = useLanguage();
 
-    const isDarkTheme = theme === "dark";
+    const isDark = theme === "dark";
 
     return (
         <button
             type="button"
             onClick={toggleTheme}
             aria-label={
-                isDarkTheme
-                    ? "Увімкнути світлу тему"
-                    : "Увімкнути темну тему"
+                isDark
+                    ? locale.header.enableLightTheme
+                    : locale.header.enableDarkTheme
+            }
+            title={
+                isDark
+                    ? locale.header.enableLightTheme
+                    : locale.header.enableDarkTheme
             }
             className="
-                group
-                inline-flex
-                h-8
-                w-8
-                cursor-pointer
+                flex
+                size-10
+                shrink-0
                 items-center
                 justify-center
-                rounded-full
+                rounded-lg
                 border
                 border-[var(--color-border)]
                 bg-[var(--color-card)]
-                text-[var(--color-text)]
-                shadow-sm
+                text-[var(--color-text-secondary)]
                 transition-all
-                duration-300
+                duration-200
                 hover:border-[var(--color-brand)]
-                hover:bg-[var(--color-brand)]
-                hover:text-white
-                hover:shadow-md
+                hover:text-[var(--color-brand)]
                 active:scale-95
-                sm:h-9
-                sm:w-9
-                md:h-10
-                md:w-10
+                focus-visible:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-[var(--color-brand)]
+                focus-visible:ring-offset-2
+                focus-visible:ring-offset-[var(--color-background)]
             "
         >
-            <span
-                className="
-                    transition-transform
-                    duration-300
-                    group-hover:rotate-12
-                "
-            >
-                {isDarkTheme ? (
-                    <Sun className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />
-                ) : (
-                    <Moon className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />
-                )}
-            </span>
+            {isDark ? (
+                <Sun
+                    className="size-5"
+                    strokeWidth={1.8}
+                    aria-hidden="true"
+                />
+            ) : (
+                <Moon
+                    className="size-5"
+                    strokeWidth={1.8}
+                    aria-hidden="true"
+                />
+            )}
         </button>
     );
 };

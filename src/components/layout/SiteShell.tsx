@@ -1,16 +1,17 @@
 import type {ReactNode} from "react";
 
+import {Header} from "@/src/components/header";
+
 type SiteShellProps = {
     children: ReactNode;
 };
 
-export const SiteShell = ({
-                              children,
-                          }: SiteShellProps) => {
+const SiteShell = ({
+                       children,
+                   }: SiteShellProps) => {
     return (
         <div
             className="
-                relative
                 flex
                 min-h-screen
                 flex-col
@@ -19,9 +20,13 @@ export const SiteShell = ({
                 text-[var(--color-text)]
             "
         >
-            <main className="relative z-10 flex-1">
+            <Header />
+
+            <main className="flex-1">
                 {children}
             </main>
         </div>
     );
 };
+
+export {SiteShell};
