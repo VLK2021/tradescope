@@ -10,13 +10,16 @@ import {
 } from "@/src/context";
 
 type SetupCardActionsProps = {
+    onUpdateAction: () => void;
     onDeleteAction: () => void;
 };
 
 const SetupCardActions = ({
+                              onUpdateAction,
                               onDeleteAction,
                           }: SetupCardActionsProps) => {
-    const {locale} = useLanguage();
+    const { locale } =
+        useLanguage();
 
     return (
         <div
@@ -33,23 +36,29 @@ const SetupCardActions = ({
         >
             <button
                 type="button"
-                disabled
                 aria-label={
-                    locale.setups.edit
+                    locale.setups
+                        .edit
                 }
                 title={
                     locale.setups
-                        .editUnavailable
+                        .edit
+                }
+                onClick={
+                    onUpdateAction
                 }
                 className="
                     flex
                     size-9
-                    cursor-not-allowed
+                    cursor-pointer
                     items-center
                     justify-center
                     rounded-lg
                     text-[var(--color-text-muted)]
-                    opacity-45
+                    transition-colors
+                    hover:bg-[var(--color-background)]
+                    hover:text-[var(--color-text)]
+                    active:bg-[var(--color-surface)]
                 "
             >
                 <Pencil
@@ -61,12 +70,16 @@ const SetupCardActions = ({
             <button
                 type="button"
                 aria-label={
-                    locale.setups.delete
+                    locale.setups
+                        .delete
                 }
                 title={
-                    locale.setups.delete
+                    locale.setups
+                        .delete
                 }
-                onClick={onDeleteAction}
+                onClick={
+                    onDeleteAction
+                }
                 className="
                     flex
                     size-9
@@ -90,4 +103,6 @@ const SetupCardActions = ({
     );
 };
 
-export {SetupCardActions};
+export {
+    SetupCardActions,
+};

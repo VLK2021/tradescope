@@ -11,6 +11,9 @@ import {
     DeleteSetupModal,
 } from "@/src/components/modals/deleteSetup";
 import {
+    UpdateSetupModal,
+} from "@/src/components/modals/updateSetup";
+import {
     useLanguage,
 } from "@/src/context";
 import {
@@ -46,9 +49,16 @@ type SetupCardProps = {
 const SetupCard = ({
                        setup,
                    }: SetupCardProps) => {
-    const router = useRouter();
+    const router =
+        useRouter();
 
-    const { locale } = useLanguage();
+    const { locale } =
+        useLanguage();
+
+    const [
+        isUpdateModalOpen,
+        setIsUpdateModalOpen,
+    ] = useState(false);
 
     const [
         isDeleteModalOpen,
@@ -81,7 +91,9 @@ const SetupCard = ({
 
     const handleToggleStatus =
         async (): Promise<void> => {
-            if (isUpdatingStatus) {
+            if (
+                isUpdatingStatus
+            ) {
                 return;
             }
 
@@ -92,27 +104,39 @@ const SetupCard = ({
                 !previousStatus;
 
             setStatusError("");
-            setIsActive(nextStatus);
-            setIsUpdatingStatus(true);
+
+            setIsActive(
+                nextStatus,
+            );
+
+            setIsUpdatingStatus(
+                true,
+            );
 
             try {
                 const response =
                     await fetch(
                         `/api/setups/${setup.id}`,
                         {
-                            method: "PATCH",
+                            method:
+                                "PATCH",
+
                             headers: {
                                 "Content-Type":
                                     "application/json",
                             },
-                            body: JSON.stringify({
-                                isActive:
-                                nextStatus,
-                            }),
+
+                            body:
+                                JSON.stringify({
+                                    isActive:
+                                    nextStatus,
+                                }),
                         },
                     );
 
-                if (!response.ok) {
+                if (
+                    !response.ok
+                ) {
                     throw new Error(
                         "Failed to update setup status",
                     );
@@ -193,7 +217,9 @@ const SetupCard = ({
                                 text-[var(--color-danger)]
                             "
                         >
-                            {statusError}
+                            {
+                                statusError
+                            }
                         </p>
                     ) : null}
 
@@ -311,6 +337,11 @@ const SetupCard = ({
                 </div>
 
                 <SetupCardActions
+                    onUpdateAction={() => {
+                        setIsUpdateModalOpen(
+                            true,
+                        );
+                    }}
                     onDeleteAction={() => {
                         setIsDeleteModalOpen(
                             true,
@@ -318,6 +349,20 @@ const SetupCard = ({
                     }}
                 />
             </article>
+
+            <UpdateSetupModal
+                isOpen={
+                    isUpdateModalOpen
+                }
+                setup={
+                    setup
+                }
+                onCloseAction={() => {
+                    setIsUpdateModalOpen(
+                        false,
+                    );
+                }}
+            />
 
             <DeleteSetupModal
                 isOpen={
