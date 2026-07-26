@@ -1,1 +1,7 @@
-export * from './HomePage';
+export {
+    HomePage,
+} from "./HomePage";
+
+export type {
+    HomePageSearchParams,
+} from "./HomePage";

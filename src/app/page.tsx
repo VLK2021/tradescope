@@ -1,5 +1,23 @@
-import {HomePage} from "@/src/components/home";
+import {
+    HomePage,
+    type HomePageSearchParams,
+} from "@/src/components/home";
 
-export default function Home() {
-    return <HomePage />;
+type HomeProps = {
+    searchParams: Promise<HomePageSearchParams>;
+};
+
+export default async function Home({
+                                       searchParams,
+                                   }: HomeProps) {
+    const resolvedSearchParams =
+        await searchParams;
+
+    return (
+        <HomePage
+            searchParams={
+                resolvedSearchParams
+            }
+        />
+    );
 }

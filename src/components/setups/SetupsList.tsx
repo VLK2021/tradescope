@@ -1,5 +1,6 @@
 import {
     Inbox,
+    SearchX,
 } from "lucide-react";
 
 import type {
@@ -12,12 +13,21 @@ import {
 
 type SetupsListProps = {
     setups: SetupItem[];
+    hasActiveFilters: boolean;
 };
 
 const SetupsList = ({
                         setups,
+                        hasActiveFilters,
                     }: SetupsListProps) => {
-    if (setups.length === 0) {
+    if (
+        setups.length === 0
+    ) {
+        const Icon =
+            hasActiveFilters
+                ? SearchX
+                : Inbox;
+
         return (
             <div
                 className="
@@ -35,7 +45,7 @@ const SetupsList = ({
                     text-center
                 "
             >
-                <Inbox
+                <Icon
                     className="
                         size-7
                         text-[var(--color-text-muted)]
@@ -51,8 +61,25 @@ const SetupsList = ({
                         text-[var(--color-text)]
                     "
                 >
-                    Сетапів поки немає
+                    {hasActiveFilters
+                        ? "Сетапів не знайдено"
+                        : "Сетапів поки немає"}
                 </h2>
+
+                {hasActiveFilters ? (
+                    <p
+                        className="
+                            mt-2
+                            max-w-md
+                            text-sm
+                            text-[var(--color-text-secondary)]
+                        "
+                    >
+                        Спробуйте змінити параметри
+                        пошуку або скинути активні
+                        фільтри.
+                    </p>
+                ) : null}
             </div>
         );
     }
@@ -67,14 +94,22 @@ const SetupsList = ({
                 xl:grid-cols-3
             "
         >
-            {setups.map((setup) => (
-                <SetupCard
-                    key={setup.id}
-                    setup={setup}
-                />
-            ))}
+            {setups.map(
+                (setup) => (
+                    <SetupCard
+                        key={
+                            setup.id
+                        }
+                        setup={
+                            setup
+                        }
+                    />
+                ),
+            )}
         </div>
     );
 };
 
-export {SetupsList};
+export {
+    SetupsList,
+};
