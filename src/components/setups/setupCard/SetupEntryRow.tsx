@@ -12,12 +12,14 @@ type SetupEntryRowProps = {
     currency: string;
 };
 
-const PERCENT_FRACTION_DIGITS = 3;
+const PERCENT_FRACTION_DIGITS =
+    3;
 
 const formatSignedPercent = (
     value: number,
 ): string => {
-    const sign = value > 0 ? "+" : "";
+    const sign =
+        value > 0 ? "+" : "";
 
     return `${sign}${value.toFixed(
         PERCENT_FRACTION_DIGITS,
@@ -66,22 +68,22 @@ const SetupEntryRow = ({
             className="
                 grid
                 min-w-0
-                grid-cols-[24px_minmax(0,1fr)_9ch_18ch]
+                grid-cols-[20px_minmax(0,1fr)_8.5ch_minmax(68px,11ch)]
                 items-center
-                gap-x-2
-                py-1.5
+                gap-x-1.5
+                py-1
             "
         >
             <span
                 className="
                     flex
-                    size-6
+                    size-5
                     shrink-0
                     items-center
                     justify-center
                     rounded-full
                     bg-[var(--color-surface)]
-                    text-xs
+                    text-[10px]
                     font-medium
                     text-[var(--color-text-secondary)]
                 "
@@ -96,25 +98,29 @@ const SetupEntryRow = ({
                     text-ellipsis
                     whitespace-nowrap
                     font-mono
-                    text-sm
+                    text-xs
                     font-medium
                     tabular-nums
                     text-[var(--color-text)]
                 "
                 title={price}
             >
-                {formatSetupPrice(price)}
+                {
+                    formatSetupPrice(
+                        price,
+                    )
+                }
             </span>
 
             <span
                 className={`
                     block
-                    w-[9ch]
+                    w-[8.5ch]
                     justify-self-end
                     whitespace-nowrap
                     text-right
                     font-mono
-                    text-xs
+                    text-[10px]
                     font-semibold
                     tabular-nums
                     ${percentClassName}
@@ -126,23 +132,29 @@ const SetupEntryRow = ({
             <span
                 className="
                     block
-                    w-[18ch]
+                    min-w-0
                     justify-self-end
                     overflow-hidden
                     text-ellipsis
                     whitespace-nowrap
                     text-right
                     font-mono
-                    text-xs
+                    text-[10px]
                     tabular-nums
                     text-[var(--color-text-muted)]
                 "
-                title={formattedDifference}
+                title={
+                    formattedDifference
+                }
             >
-                {formattedDifference}
+                {
+                    formattedDifference
+                }
             </span>
         </div>
     );
 };
 
-export {SetupEntryRow};
+export {
+    SetupEntryRow,
+};

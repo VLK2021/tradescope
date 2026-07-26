@@ -11,6 +11,9 @@ import {
     DeleteSetupModal,
 } from "@/src/components/modals/deleteSetup";
 import {
+    useLanguage,
+} from "@/src/context";
+import {
     formatSetupPrice,
 } from "@/src/helpers/formatSetupPrice";
 import {
@@ -35,7 +38,6 @@ import {
 import {
     SetupTargets,
 } from "./SetupTargets";
-import {useLanguage} from "@/src/context";
 
 type SetupCardProps = {
     setup: SetupItem;
@@ -46,7 +48,7 @@ const SetupCard = ({
                    }: SetupCardProps) => {
     const router = useRouter();
 
-    const {locale} = useLanguage();
+    const { locale } = useLanguage();
 
     const [
         isDeleteModalOpen,
@@ -56,7 +58,9 @@ const SetupCard = ({
     const [
         isActive,
         setIsActive,
-    ] = useState(setup.isActive);
+    ] = useState(
+        setup.isActive,
+    );
 
     const [
         isUpdatingStatus,
@@ -121,7 +125,8 @@ const SetupCard = ({
                 );
 
                 setStatusError(
-                    locale.setups.statusUpdateError,
+                    locale.setups
+                        .statusUpdateError,
                 );
             } finally {
                 setIsUpdatingStatus(
@@ -135,10 +140,11 @@ const SetupCard = ({
             <article
                 className="
                     flex
+                    h-[370px]
                     min-w-0
                     flex-col
                     overflow-hidden
-                    rounded-2xl
+                    rounded-xl
                     border
                     border-[var(--color-border)]
                     bg-[var(--color-card)]
@@ -147,20 +153,23 @@ const SetupCard = ({
                 <div
                     className="
                         flex
+                        min-h-0
                         flex-1
                         flex-col
-                        gap-4
-                        px-4
-                        pt-4
-                        pb-3
+                        px-3.5
+                        pt-3.5
                     "
                 >
                     <SetupCardHeader
-                        symbol={setup.symbol}
+                        symbol={
+                            setup.symbol
+                        }
                         direction={
                             setup.direction
                         }
-                        isActive={isActive}
+                        isActive={
+                            isActive
+                        }
                         isUpdatingStatus={
                             isUpdatingStatus
                         }
@@ -173,12 +182,13 @@ const SetupCard = ({
                         <p
                             role="alert"
                             className="
+                                mt-2
                                 rounded-lg
                                 border
                                 border-[color-mix(in_srgb,var(--color-danger)_25%,transparent)]
                                 bg-[color-mix(in_srgb,var(--color-danger)_8%,transparent)]
-                                px-3
-                                py-2
+                                px-2.5
+                                py-1.5
                                 text-xs
                                 text-[var(--color-danger)]
                             "
@@ -189,6 +199,7 @@ const SetupCard = ({
 
                     <div
                         className="
+                            mt-3
                             flex
                             min-w-0
                             items-baseline
@@ -198,11 +209,14 @@ const SetupCard = ({
                         <span
                             className="
                                 shrink-0
-                                text-sm
+                                text-xs
                                 text-[var(--color-text-muted)]
                             "
                         >
-                           {locale.setups.currentPrice}
+                            {
+                                locale.setups
+                                    .currentPrice
+                            }
                         </span>
 
                         <span
@@ -212,7 +226,7 @@ const SetupCard = ({
                                 text-ellipsis
                                 whitespace-nowrap
                                 font-mono
-                                text-base
+                                text-sm
                                 font-medium
                                 tabular-nums
                                 text-[var(--color-text-secondary)]
@@ -257,30 +271,43 @@ const SetupCard = ({
                         />
                     </div>
 
-                    <SetupEntries
-                        entries={
-                            setup.entries
-                        }
-                        currentPrice={
-                            currentPrice
-                        }
-                    />
+                    <div className="mt-3">
+                        <SetupEntries
+                            entries={
+                                setup.entries
+                            }
+                            currentPrice={
+                                currentPrice
+                            }
+                        />
+                    </div>
 
-                    <SetupTargets
-                        stopLoss={
-                            setup.stopLoss
-                        }
-                        takeProfits={
-                            setup.takeProfits
-                        }
-                    />
+                    <div className="mt-3">
+                        <SetupTargets
+                            stopLoss={
+                                setup.stopLoss
+                            }
+                            takeProfits={
+                                setup.takeProfits
+                            }
+                        />
+                    </div>
 
-                    <SetupCardMeta
-                        note={setup.note}
-                        createdAt={
-                            setup.createdAt
-                        }
-                    />
+                    <div
+                        className="
+                            mt-auto
+                            pb-2.5
+                        "
+                    >
+                        <SetupCardMeta
+                            note={
+                                setup.note
+                            }
+                            createdAt={
+                                setup.createdAt
+                            }
+                        />
+                    </div>
                 </div>
 
                 <SetupCardActions
@@ -296,7 +323,9 @@ const SetupCard = ({
                 isOpen={
                     isDeleteModalOpen
                 }
-                setupId={setup.id}
+                setupId={
+                    setup.id
+                }
                 setupSymbol={
                     setup.symbol
                 }
@@ -310,4 +339,6 @@ const SetupCard = ({
     );
 };
 
-export {SetupCard};
+export {
+    SetupCard,
+};

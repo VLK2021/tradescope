@@ -17,34 +17,81 @@ const SetupEntries = ({
                           entries,
                           currentPrice,
                       }: SetupEntriesProps) => {
-    const {locale} = useLanguage();
+    const { locale } =
+        useLanguage();
 
     return (
         <section
             className="
+                min-w-0
                 border-t
                 border-[var(--color-border)]
                 pt-2.5
             "
         >
-            <h3
+            <div
                 className="
                     mb-1
-                    text-sm
-                    font-medium
-                    text-[var(--color-text-secondary)]
+                    flex
+                    items-center
+                    justify-between
+                    gap-3
                 "
             >
-                {locale.setups.entries}
-            </h3>
+                <h3
+                    className="
+                        text-xs
+                        font-medium
+                        text-[var(--color-text-secondary)]
+                    "
+                >
+                    {
+                        locale.setups
+                            .entries
+                    }
+                </h3>
 
-            <div>
+                {entries.length > 2 ? (
+                    <span
+                        className="
+                            text-[10px]
+                            text-[var(--color-text-muted)]
+                        "
+                    >
+                        {entries.length}
+                    </span>
+                ) : null}
+            </div>
+
+            <div
+                className="
+                    h-[62px]
+                    min-h-[62px]
+                    overflow-y-auto
+                    overscroll-contain
+                    pr-1.5
+                    [scrollbar-color:var(--color-border)_transparent]
+                    [scrollbar-width:thin]
+                    [&::-webkit-scrollbar]:w-1
+                    [&::-webkit-scrollbar-track]:bg-transparent
+                    [&::-webkit-scrollbar-thumb]:rounded-full
+                    [&::-webkit-scrollbar-thumb]:bg-[var(--color-border)]
+                    hover:[&::-webkit-scrollbar-thumb]:bg-[var(--color-text-muted)]
+                "
+            >
                 {entries.map(
-                    (entry, index) => (
+                    (
+                        entry,
+                        index,
+                    ) => (
                         <SetupEntryRow
                             key={`${entry}-${index}`}
-                            index={index + 1}
-                            price={entry}
+                            index={
+                                index + 1
+                            }
+                            price={
+                                entry
+                            }
                             currentPrice={
                                 currentPrice
                             }
@@ -60,4 +107,6 @@ const SetupEntries = ({
     );
 };
 
-export {SetupEntries};
+export {
+    SetupEntries,
+};

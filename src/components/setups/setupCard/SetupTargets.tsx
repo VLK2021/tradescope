@@ -11,28 +11,31 @@ const SetupTargets = ({
                           stopLoss,
                           takeProfits,
                       }: SetupTargetsProps) => {
-    if (
-        !stopLoss &&
-        takeProfits.length === 0
-    ) {
-        return null;
-    }
+    const formattedTakeProfits =
+        takeProfits.length > 0
+            ? takeProfits
+                .map(
+                    formatSetupPrice,
+                )
+                .join(" / ")
+            : "—";
 
     return (
         <section
             className="
                 grid
-                grid-cols-[minmax(88px,0.7fr)_minmax(0,1.8fr)]
-                gap-5
+                min-h-[58px]
+                grid-cols-[72px_minmax(0,1fr)]
+                gap-3
                 border-t
                 border-[var(--color-border)]
-                pt-4
+                pt-2.5
             "
         >
             <div className="min-w-0">
                 <h3
                     className="
-                        text-sm
+                        text-xs
                         font-semibold
                         uppercase
                         text-[var(--color-danger)]
@@ -49,7 +52,7 @@ const SetupTargets = ({
                         text-ellipsis
                         whitespace-nowrap
                         font-mono
-                        text-sm
+                        text-xs
                         font-semibold
                         tabular-nums
                         text-[var(--color-danger)]
@@ -70,7 +73,7 @@ const SetupTargets = ({
             <div className="min-w-0">
                 <h3
                     className="
-                        text-sm
+                        text-xs
                         font-semibold
                         uppercase
                         text-[var(--color-text-secondary)]
@@ -83,29 +86,28 @@ const SetupTargets = ({
                     className="
                         mt-1
                         min-w-0
-                        break-words
+                        overflow-hidden
+                        text-ellipsis
+                        whitespace-nowrap
                         font-mono
-                        text-sm
+                        text-xs
                         font-semibold
-                        leading-6
                         tabular-nums
                         text-[var(--color-success)]
                     "
-                    title={takeProfits.join(
-                        " / ",
-                    )}
+                    title={
+                        formattedTakeProfits
+                    }
                 >
-                    {takeProfits.length > 0
-                        ? takeProfits
-                            .map(
-                                formatSetupPrice,
-                            )
-                            .join(" / ")
-                        : "—"}
+                    {
+                        formattedTakeProfits
+                    }
                 </p>
             </div>
         </section>
     );
 };
 
-export {SetupTargets};
+export {
+    SetupTargets,
+};
