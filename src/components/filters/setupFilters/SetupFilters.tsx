@@ -3,7 +3,6 @@
 import {
     type ChangeEvent,
     type FormEvent,
-    useEffect,
     useState,
     useTransition,
 } from "react";
@@ -40,13 +39,16 @@ type SetupFiltersProps = {
         | "desc";
 };
 
-const SetupFilters = ({
-                          symbol,
-                          status,
-                          direction,
-                          sort,
-                          order,
-                      }: SetupFiltersProps) => {
+type SetupFiltersContentProps =
+    SetupFiltersProps;
+
+const SetupFiltersContent = ({
+                                 symbol,
+                                 status,
+                                 direction,
+                                 sort,
+                                 order,
+                             }: SetupFiltersContentProps) => {
     const router =
         useRouter();
 
@@ -65,14 +67,6 @@ const SetupFilters = ({
         isPending,
         startTransition,
     ] = useTransition();
-
-    useEffect(() => {
-        setSearchValue(
-            symbol,
-        );
-    }, [
-        symbol,
-    ]);
 
     const updateSearchParams = (
         updates: Record<
@@ -220,21 +214,24 @@ const SetupFilters = ({
         order !== "desc";
 
     const selectClassName = `
-        h-9
+        h-8
         w-full
         cursor-pointer
-        rounded-lg
+        rounded-md
         border
         border-[var(--color-border)]
         bg-[var(--color-background)]
         px-2.5
-        text-xs
-        text-[var(--color-text)]
+        text-[11px]
+        font-normal
+        text-[var(--color-text-secondary)]
         outline-none
         transition-colors
+        hover:text-[var(--color-text)]
         focus:border-[var(--color-brand)]
+        focus:text-[var(--color-text)]
         disabled:cursor-wait
-        disabled:opacity-60
+        disabled:opacity-50
     `;
 
     return (
@@ -246,16 +243,16 @@ const SetupFilters = ({
                 border
                 border-[var(--color-border)]
                 bg-[var(--color-surface)]
-                p-3
-                sm:p-3.5
+                p-2.5
+                sm:p-3
             "
         >
             <div
                 className="
                     grid
-                    gap-2.5
+                    gap-2
                     md:grid-cols-2
-                    xl:grid-cols-[minmax(220px,1.45fr)_minmax(130px,0.75fr)_minmax(140px,0.8fr)_minmax(170px,1fr)_minmax(140px,0.8fr)_auto]
+                    xl:grid-cols-[minmax(220px,1.45fr)_minmax(125px,0.75fr)_minmax(135px,0.8fr)_minmax(165px,1fr)_minmax(135px,0.8fr)_auto]
                 "
             >
                 <form
@@ -264,9 +261,10 @@ const SetupFilters = ({
                     }
                     className="
                         flex
+                        h-8
                         min-w-0
                         items-center
-                        rounded-lg
+                        rounded-md
                         border
                         border-[var(--color-border)]
                         bg-[var(--color-background)]
@@ -312,15 +310,17 @@ const SetupFilters = ({
                         }}
                         placeholder="Пошук за тикером"
                         className="
-                            h-9
+                            h-full
                             min-w-0
                             flex-1
                             bg-transparent
-                            px-2.5
-                            text-xs
-                            text-[var(--color-text)]
+                            px-2
+                            text-[11px]
+                            font-normal
+                            text-[var(--color-text-secondary)]
                             outline-none
                             placeholder:text-[var(--color-text-muted)]
+                            focus:text-[var(--color-text)]
                             disabled:cursor-wait
                         "
                     />
@@ -331,16 +331,16 @@ const SetupFilters = ({
                             isPending
                         }
                         className="
-                            mr-1
+                            mr-0.5
                             flex
                             h-7
                             shrink-0
                             items-center
                             justify-center
-                            rounded-md
+                            rounded-[5px]
                             bg-[var(--color-brand)]
-                            px-3
-                            text-xs
+                            px-2.5
+                            text-[11px]
                             font-medium
                             text-white
                             transition-colors
@@ -363,9 +363,7 @@ const SetupFilters = ({
 
                     <select
                         id="setup-status-filter"
-                        value={
-                            status
-                        }
+                        value={status}
                         disabled={
                             isPending
                         }
@@ -400,9 +398,7 @@ const SetupFilters = ({
 
                     <select
                         id="setup-direction-filter"
-                        value={
-                            direction
-                        }
+                        value={direction}
                         disabled={
                             isPending
                         }
@@ -437,9 +433,7 @@ const SetupFilters = ({
 
                     <select
                         id="setup-sort-filter"
-                        value={
-                            sort
-                        }
+                        value={sort}
                         disabled={
                             isPending
                         }
@@ -474,9 +468,7 @@ const SetupFilters = ({
 
                     <select
                         id="setup-order-filter"
-                        value={
-                            order
-                        }
+                        value={order}
                         disabled={
                             isPending
                         }
@@ -508,22 +500,22 @@ const SetupFilters = ({
                     }
                     className="
                         flex
-                        h-9
+                        h-8
                         items-center
                         justify-center
                         gap-1.5
-                        rounded-lg
+                        rounded-md
                         border
                         border-[var(--color-border)]
-                        px-3
-                        text-xs
-                        font-medium
-                        text-[var(--color-text-secondary)]
+                        px-2.5
+                        text-[11px]
+                        font-normal
+                        text-[var(--color-text-muted)]
                         transition-colors
                         hover:bg-[var(--color-background)]
-                        hover:text-[var(--color-text)]
+                        hover:text-[var(--color-text-secondary)]
                         disabled:cursor-not-allowed
-                        disabled:opacity-40
+                        disabled:opacity-35
                     "
                 >
                     <RotateCcw
@@ -538,8 +530,8 @@ const SetupFilters = ({
             {isPending ? (
                 <p
                     className="
-                        mt-2
-                        text-[11px]
+                        mt-1.5
+                        text-[10px]
                         text-[var(--color-text-muted)]
                     "
                 >
@@ -547,6 +539,25 @@ const SetupFilters = ({
                 </p>
             ) : null}
         </section>
+    );
+};
+
+const SetupFilters = (
+    props: SetupFiltersProps,
+) => {
+    const componentKey = [
+        props.symbol,
+        props.status,
+        props.direction,
+        props.sort,
+        props.order,
+    ].join(":");
+
+    return (
+        <SetupFiltersContent
+            key={componentKey}
+            {...props}
+        />
     );
 };
 
