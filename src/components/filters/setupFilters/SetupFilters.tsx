@@ -19,18 +19,22 @@ import {
 
 type SetupFiltersProps = {
     symbol: string;
+
     status:
         | "all"
         | "active"
         | "inactive";
+
     direction:
         | "all"
         | "LONG"
         | "SHORT";
+
     sort:
         | "createdAt"
         | "updatedAt"
         | "symbol";
+
     order:
         | "asc"
         | "desc";
@@ -175,8 +179,7 @@ const SetupFilters = ({
 
         updateSearchParams({
             sort:
-                value ===
-                "createdAt"
+                value === "createdAt"
                     ? null
                     : value,
         });
@@ -216,25 +219,43 @@ const SetupFilters = ({
         sort !== "createdAt" ||
         order !== "desc";
 
+    const selectClassName = `
+        h-9
+        w-full
+        cursor-pointer
+        rounded-lg
+        border
+        border-[var(--color-border)]
+        bg-[var(--color-background)]
+        px-2.5
+        text-xs
+        text-[var(--color-text)]
+        outline-none
+        transition-colors
+        focus:border-[var(--color-brand)]
+        disabled:cursor-wait
+        disabled:opacity-60
+    `;
+
     return (
         <section
             aria-label="Фільтрація та сортування сетапів"
             className="
-                mb-6
-                rounded-2xl
+                mb-5
+                rounded-xl
                 border
                 border-[var(--color-border)]
                 bg-[var(--color-surface)]
-                p-4
-                sm:p-5
+                p-3
+                sm:p-3.5
             "
         >
             <div
                 className="
                     grid
-                    gap-3
+                    gap-2.5
                     md:grid-cols-2
-                    xl:grid-cols-[minmax(240px,1.5fr)_minmax(150px,0.8fr)_minmax(150px,0.8fr)_minmax(180px,1fr)_minmax(150px,0.8fr)_auto]
+                    xl:grid-cols-[minmax(220px,1.45fr)_minmax(130px,0.75fr)_minmax(140px,0.8fr)_minmax(170px,1fr)_minmax(140px,0.8fr)_auto]
                 "
             >
                 <form
@@ -245,7 +266,7 @@ const SetupFilters = ({
                         flex
                         min-w-0
                         items-center
-                        rounded-xl
+                        rounded-lg
                         border
                         border-[var(--color-border)]
                         bg-[var(--color-background)]
@@ -255,8 +276,8 @@ const SetupFilters = ({
                 >
                     <Search
                         className="
-                            ml-3
-                            size-4
+                            ml-2.5
+                            size-3.5
                             shrink-0
                             text-[var(--color-text-muted)]
                         "
@@ -291,12 +312,12 @@ const SetupFilters = ({
                         }}
                         placeholder="Пошук за тикером"
                         className="
-                            h-11
+                            h-9
                             min-w-0
                             flex-1
                             bg-transparent
-                            px-3
-                            text-sm
+                            px-2.5
+                            text-xs
                             text-[var(--color-text)]
                             outline-none
                             placeholder:text-[var(--color-text-muted)]
@@ -312,11 +333,11 @@ const SetupFilters = ({
                         className="
                             mr-1
                             flex
-                            h-9
+                            h-7
                             shrink-0
                             items-center
                             justify-center
-                            rounded-lg
+                            rounded-md
                             bg-[var(--color-brand)]
                             px-3
                             text-xs
@@ -351,23 +372,9 @@ const SetupFilters = ({
                         onChange={
                             handleStatusChange
                         }
-                        className="
-                            h-11
-                            w-full
-                            cursor-pointer
-                            rounded-xl
-                            border
-                            border-[var(--color-border)]
-                            bg-[var(--color-background)]
-                            px-3
-                            text-sm
-                            text-[var(--color-text)]
-                            outline-none
-                            transition-colors
-                            focus:border-[var(--color-brand)]
-                            disabled:cursor-wait
-                            disabled:opacity-60
-                        "
+                        className={
+                            selectClassName
+                        }
                     >
                         <option value="all">
                             Усі статуси
@@ -402,23 +409,9 @@ const SetupFilters = ({
                         onChange={
                             handleDirectionChange
                         }
-                        className="
-                            h-11
-                            w-full
-                            cursor-pointer
-                            rounded-xl
-                            border
-                            border-[var(--color-border)]
-                            bg-[var(--color-background)]
-                            px-3
-                            text-sm
-                            text-[var(--color-text)]
-                            outline-none
-                            transition-colors
-                            focus:border-[var(--color-brand)]
-                            disabled:cursor-wait
-                            disabled:opacity-60
-                        "
+                        className={
+                            selectClassName
+                        }
                     >
                         <option value="all">
                             LONG і SHORT
@@ -453,23 +446,9 @@ const SetupFilters = ({
                         onChange={
                             handleSortChange
                         }
-                        className="
-                            h-11
-                            w-full
-                            cursor-pointer
-                            rounded-xl
-                            border
-                            border-[var(--color-border)]
-                            bg-[var(--color-background)]
-                            px-3
-                            text-sm
-                            text-[var(--color-text)]
-                            outline-none
-                            transition-colors
-                            focus:border-[var(--color-brand)]
-                            disabled:cursor-wait
-                            disabled:opacity-60
-                        "
+                        className={
+                            selectClassName
+                        }
                     >
                         <option value="createdAt">
                             За датою створення
@@ -504,23 +483,9 @@ const SetupFilters = ({
                         onChange={
                             handleOrderChange
                         }
-                        className="
-                            h-11
-                            w-full
-                            cursor-pointer
-                            rounded-xl
-                            border
-                            border-[var(--color-border)]
-                            bg-[var(--color-background)]
-                            px-3
-                            text-sm
-                            text-[var(--color-text)]
-                            outline-none
-                            transition-colors
-                            focus:border-[var(--color-brand)]
-                            disabled:cursor-wait
-                            disabled:opacity-60
-                        "
+                        className={
+                            selectClassName
+                        }
                     >
                         <option value="desc">
                             За спаданням
@@ -543,15 +508,15 @@ const SetupFilters = ({
                     }
                     className="
                         flex
-                        h-11
+                        h-9
                         items-center
                         justify-center
-                        gap-2
-                        rounded-xl
+                        gap-1.5
+                        rounded-lg
                         border
                         border-[var(--color-border)]
-                        px-4
-                        text-sm
+                        px-3
+                        text-xs
                         font-medium
                         text-[var(--color-text-secondary)]
                         transition-colors
@@ -562,7 +527,7 @@ const SetupFilters = ({
                     "
                 >
                     <RotateCcw
-                        className="size-4"
+                        className="size-3.5"
                         aria-hidden="true"
                     />
 
@@ -573,8 +538,8 @@ const SetupFilters = ({
             {isPending ? (
                 <p
                     className="
-                        mt-3
-                        text-xs
+                        mt-2
+                        text-[11px]
                         text-[var(--color-text-muted)]
                     "
                 >
