@@ -88,7 +88,7 @@ const SetupEntryRow = ({
                     text-[var(--color-text-secondary)]
                 "
             >
-                {index}
+                {index}.
             </span>
 
             <span
@@ -98,7 +98,7 @@ const SetupEntryRow = ({
                     text-ellipsis
                     whitespace-nowrap
                     font-mono
-                    text-xs
+                    text-[14px]
                     font-medium
                     tabular-nums
                     text-[var(--color-text)]
@@ -120,7 +120,7 @@ const SetupEntryRow = ({
                     whitespace-nowrap
                     text-right
                     font-mono
-                    text-[10px]
+                    text-[13px]
                     font-semibold
                     tabular-nums
                     ${percentClassName}
